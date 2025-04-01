@@ -9,6 +9,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatButton;
 
 import com.google.android.material.button.MaterialButton;
 
@@ -30,24 +31,30 @@ public class LoginActivity extends AppCompatActivity {
 
     private EditText usernameEditText;
     private EditText passwordEditText;
-    private MaterialButton loginButton;
+    private AppCompatButton loginButton;
     private SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        loadUsers();
 
         usernameEditText = findViewById(R.id.username_edit_text);
         passwordEditText = findViewById(R.id.password_edit_text);
         loginButton = findViewById(R.id.btn_login);
         prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE);
+
+        loadUsers();
         loginButton.setOnClickListener(v -> loginUserFun());
     }
 
-    private void loadUsers(){
-        Request request = new Request.Builder().url("http://127.0.0.1:5000/load-users").build();
+    private void loadUsers() {
+        String json = "{}";
+        RequestBody body = RequestBody.create(json, MediaType.get("application/json; charset=utf-8"));
+        Request request = new Request.Builder()
+                .url("http://192.168.0.30:5000/import-users")
+                .post(body)
+                .build();
 
         new OkHttpClient().newCall(request).enqueue(new Callback() {
             @Override
@@ -60,15 +67,18 @@ public class LoginActivity extends AppCompatActivity {
                 if (response.isSuccessful()) {
                     try {
                         runOnUiThread(() -> {
-                            Toast.makeText(LoginActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginActivity.this, "Users loaded successfully!", Toast.LENGTH_SHORT).show();
                         });
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                } else {
+                    runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Failed to load users!", Toast.LENGTH_SHORT).show());
                 }
             }
         });
     }
+
     private void loginUserFun() {
         String username = usernameEditText.getText().toString();
         String password = passwordEditText.getText().toString();
@@ -82,7 +92,7 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         RequestBody body = RequestBody.create(json.toString(), MediaType.get("application/json; charset=utf-8"));
-        Request request = new Request.Builder().url("http://127.0.0.1:5000/login").post(body).build();
+        Request request = new Request.Builder().url("http://192.168.0.30:5000/login").post(body).build();
 
         new OkHttpClient().newCall(request).enqueue(new Callback() {
             @Override

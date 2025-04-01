@@ -15,13 +15,13 @@ app.config["JWT_SECRET_KEY"] = "Kkey123"
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
 jwt = JWTManager(app)
 
-os.makedirs('database', exist_ok=True)
-engine = create_engine('sqlite:///database/RWdestroydb.db')
+os.makedirs('backend/database', exist_ok=True)
+engine = create_engine('sqlite:///backend/database/RWdestroydb.db')
 
 # File paths
-USER_FILE_PATH = 'excel_files/users.xlsx'
-BOX_DB_FILE_PATH = 'excel_files/boxes.xlsx'
-REPORT_FILE_PATH = 'reports/scanned_boxes_report.xlsx'
+USER_FILE_PATH = 'backend/excel_files/users.xlsx'
+BOX_DB_FILE_PATH = 'backend/excel_files/boxes.xlsx'
+REPORT_FILE_PATH = 'backend/reports/scanned_boxes_report.xlsx'
 os.makedirs('reports', exist_ok=True)
 
 
@@ -181,4 +181,4 @@ def home():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)

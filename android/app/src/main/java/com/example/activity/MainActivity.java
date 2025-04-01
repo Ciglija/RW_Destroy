@@ -25,7 +25,6 @@ public class MainActivity extends AppCompatActivity {
     private Button btnScan;
     private Button btnFinish;
     private Button btnSendReport;
-    private final OkHttpClient client = new OkHttpClient();
     private String authToken = null;
 
     @Override
@@ -45,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
     private void loadDatabase() {
-        String SERVER_URL = "http://127.0.0.1:5000/load-database";
+        String SERVER_URL = "http://10.0.2.2:5000/load-database";
         String token = getSharedPreferences("AppPrefs", MODE_PRIVATE).getString("jwt_token", "");
 
         Request request = new Request.Builder()
@@ -68,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void sendReport() {
-        String SERVER_URL = "http://127.0.0.1:5000/generate-report";
+        String SERVER_URL = "http://10.0.2.2:5000/generate-report";
         new OkHttpClient().newCall(new Request.Builder().url(SERVER_URL).get().build()).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {

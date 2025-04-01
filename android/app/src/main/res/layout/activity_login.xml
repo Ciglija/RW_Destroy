@@ -48,14 +48,14 @@
         android:background="@drawable/border"
         android:padding="20dp" />
 
-    <androidx.appcompat.widget.AppCompatButton
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_login"
         android:layout_width="300dp"
         android:layout_height="60dp"
         android:layout_gravity="center"
         android:text="LOGIN"
         android:textColor="#FFF"
-        android:background="#003366"
+        android:backgroundTint="#003366"
         android:layout_marginTop="20dp" />
 
 </LinearLayout>
