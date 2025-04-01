@@ -75,7 +75,7 @@ public class ScannerActivity extends AppCompatActivity {
 
             RequestBody body = RequestBody.create(json.toString(), MediaType.get("application/json; charset=utf-8"));
             Request request = new Request.Builder()
-                    .url("http://10.0.2.2:5000/scan-box")
+                    .url("http://192.168.0.30:5000/scan-box")
                     .post(body)
                     .addHeader("Authorization", "Bearer " + token)
                     .build();
@@ -83,12 +83,12 @@ public class ScannerActivity extends AppCompatActivity {
             new OkHttpClient().newCall(request).enqueue(new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
-                    runOnUiThread(() -> Toast.makeText(ScannerActivity.this, "Error sending barcode", Toast.LENGTH_SHORT).show());
+                    runOnUiThread(() -> Toast.makeText(ScannerActivity.this, "Greska sa internetom!", Toast.LENGTH_SHORT).show());
                 }
 
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
-                    runOnUiThread(() -> Toast.makeText(ScannerActivity.this, "Barcode sent!", Toast.LENGTH_SHORT).show());
+                    runOnUiThread(() -> Toast.makeText(ScannerActivity.this, "Uspesno skeniranje!", Toast.LENGTH_SHORT).show());
                 }
             });
         } catch (Exception e) {
