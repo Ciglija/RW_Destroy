@@ -1,0 +1,26 @@
+[
+    {
+        "merged": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-mergeDebugResources-43:\\layout\\activity_main.xml",
+        "source": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-main-46:\\layout\\activity_main.xml"
+    },
+    {
+        "merged": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-mergeDebugResources-43:\\layout\\activity_login.xml",
+        "source": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-main-46:\\layout\\activity_login.xml"
+    },
+    {
+        "merged": "com.example.activity.app-mergeDebugResources-43:/layout/activity_login.xml",
+        "source": "com.example.activity.app-main-46:/layout/activity_login.xml"
+    },
+    {
+        "merged": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-mergeDebugResources-43:\\layout\\activity_scanner.xml",
+        "source": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-main-46:\\layout\\activity_scanner.xml"
+    },
+    {
+        "merged": "com.example.activity.app-mergeDebugResources-43:/layout/activity_main.xml",
+        "source": "com.example.activity.app-main-46:/layout/activity_main.xml"
+    },
+    {
+        "merged": "com.example.activity.app-mergeDebugResources-43:/layout/activity_scanner.xml",
+        "source": "com.example.activity.app-main-46:/layout/activity_scanner.xml"
+    }
+]
