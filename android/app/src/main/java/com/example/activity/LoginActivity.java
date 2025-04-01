@@ -37,13 +37,37 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
+        loadUsers();
 
         usernameEditText = findViewById(R.id.username_edit_text);
         passwordEditText = findViewById(R.id.password_edit_text);
         loginButton = findViewById(R.id.btn_login);
         prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE);
         loginButton.setOnClickListener(v -> loginUserFun());
+    }
+
+    private void loadUsers(){
+        Request request = new Request.Builder().url("http://127.0.0.1:5000/load-users").build();
+
+        new OkHttpClient().newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Loading Users Failed!", Toast.LENGTH_SHORT).show());
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    try {
+                        runOnUiThread(() -> {
+                            Toast.makeText(LoginActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
+                        });
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
     }
     private void loginUserFun() {
         String username = usernameEditText.getText().toString();
@@ -58,7 +82,7 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         RequestBody body = RequestBody.create(json.toString(), MediaType.get("application/json; charset=utf-8"));
-        Request request = new Request.Builder().url("SERVER_URL").post(body).build();
+        Request request = new Request.Builder().url("http://127.0.0.1:5000/login").post(body).build();
 
         new OkHttpClient().newCall(request).enqueue(new Callback() {
             @Override

@@ -75,7 +75,7 @@ public class ScannerActivity extends AppCompatActivity {
 
             RequestBody body = RequestBody.create(json.toString(), MediaType.get("application/json; charset=utf-8"));
             Request request = new Request.Builder()
-                    .url("http://192.168.1.100:5000/scan-box")
+                    .url("http://127.0.0.1:5000/scan-box")
                     .post(body)
                     .addHeader("Authorization", "Bearer " + token)
                     .build();

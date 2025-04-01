@@ -21,8 +21,6 @@ import okhttp3.Response;
 
 
 public class MainActivity extends AppCompatActivity {
-
-    private static final String SERVER_URL = "http://192.168.1.100:5000/test";
     private Button btnLoadDatabase;
     private Button btnScan;
     private Button btnFinish;
@@ -47,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
     private void loadDatabase() {
-        String SERVER_URL = "http://192.168.1.100:5000/load-database";
+        String SERVER_URL = "http://127.0.0.1:5000/load-database";
         String token = getSharedPreferences("AppPrefs", MODE_PRIVATE).getString("jwt_token", "");
 
         Request request = new Request.Builder()
@@ -70,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void sendReport() {
-        String SERVER_URL = "http://192.168.1.100:5000/generate-report";
+        String SERVER_URL = "http://127.0.0.1:5000/generate-report";
         new OkHttpClient().newCall(new Request.Builder().url(SERVER_URL).get().build()).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
