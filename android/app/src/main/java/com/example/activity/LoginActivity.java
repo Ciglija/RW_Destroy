@@ -28,7 +28,6 @@ import okhttp3.Response;
 
 public class LoginActivity extends AppCompatActivity {
 
-
     private EditText usernameEditText;
     private EditText passwordEditText;
     private AppCompatButton loginButton;
@@ -59,21 +58,13 @@ public class LoginActivity extends AppCompatActivity {
         new OkHttpClient().newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Loading Users Failed!", Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Greška u konekciji!", Toast.LENGTH_SHORT).show());
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful()) {
-                    try {
-                        runOnUiThread(() -> {
-                            Toast.makeText(LoginActivity.this, "Users loaded successfully!", Toast.LENGTH_SHORT).show();
-                        });
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Failed to load users!", Toast.LENGTH_SHORT).show());
+                if (!response.isSuccessful()) {
+                    runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Korisnici nisu učitani molimo vas da restartujete aplikaciju.", Toast.LENGTH_SHORT).show());
                 }
             }
         });
@@ -97,7 +88,7 @@ public class LoginActivity extends AppCompatActivity {
         new OkHttpClient().newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Login failed!", Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Greška u konekciji!", Toast.LENGTH_SHORT).show());
             }
 
             @Override
@@ -109,13 +100,19 @@ public class LoginActivity extends AppCompatActivity {
 
                         prefs.edit().putString("jwt_token", token).apply();
                         runOnUiThread(() -> {
-                            Toast.makeText(LoginActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginActivity.this, "Uspešno ste se ulogovali!", Toast.LENGTH_SHORT).show();
                             startActivity(new Intent(LoginActivity.this, MainActivity.class));
                             finish();
                         });
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                }
+                else{
+                    passwordEditText.setText("");
+                    runOnUiThread(() -> {
+                        Toast.makeText(LoginActivity.this, "Pogrešni kredencijali!", Toast.LENGTH_SHORT).show();
+                    });
                 }
             }
         });
