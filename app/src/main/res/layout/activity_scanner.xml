@@ -2,33 +2,38 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="16dp">
 
     <TextView
-        android:id="@+id/skenirani_barkod"
+        android:id="@+id/scanned_barcode_text_view"
         android:text="Očitani barkodovi:"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:padding="16dp"
-        android:textSize="18sp" />
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:paddingBottom="8dp"/>
 
     <ListView
-        android:id="@+id/lista_barkodova"
+        android:id="@+id/barcode_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/skenirani_barkod"
-        android:padding="16dp" />
+        android:layout_height="0dp"
+        android:layout_below="@id/scanned_barcode_text_view"
+        android:layout_above="@id/status_scanner"
+        android:divider="@android:color/darker_gray"
+        android:dividerHeight="1dp"/>
 
     <TextView
-        android:id="@+id/status_skener"
+        android:id="@+id/status_scanner"
         android:text="Status: "
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:textSize="16sp"
-        android:padding="16dp" />
+        android:textStyle="bold"
+        android:paddingTop="8dp" />
 
 </RelativeLayout>

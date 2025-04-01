@@ -1,5 +1,7 @@
 package com.example.activity;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -10,6 +12,18 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.button.MaterialButton;
 
+import org.json.JSONObject;
+
+import java.io.IOException;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -17,7 +31,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText usernameEditText;
     private EditText passwordEditText;
     private MaterialButton loginButton;
-    private TextView forgetPasswordTextView;
+    private SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,34 +39,50 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
 
-        usernameEditText = findViewById(R.id.usernameEditText);
-        passwordEditText = findViewById(R.id.passwordEditText);
-        loginButton = findViewById(R.id.loginButton);
-        forgetPasswordTextView = findViewById(R.id.forgetPasswordTextView);
+        usernameEditText = findViewById(R.id.username_edit_text);
+        passwordEditText = findViewById(R.id.password_edit_text);
+        loginButton = findViewById(R.id.btn_login);
+        prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE);
+        loginButton.setOnClickListener(v -> loginUserFun());
+    }
+    private void loginUserFun() {
+        String username = usernameEditText.getText().toString();
+        String password = passwordEditText.getText().toString();
 
+        JSONObject json = new JSONObject();
+        try {
+            json.put("username", username);
+            json.put("password", password);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        loginButton.setOnClickListener(new View.OnClickListener() {
+        RequestBody body = RequestBody.create(json.toString(), MediaType.get("application/json; charset=utf-8"));
+        Request request = new Request.Builder().url("SERVER_URL").post(body).build();
+
+        new OkHttpClient().newCall(request).enqueue(new Callback() {
             @Override
-            public void onClick(View view) {
-
-                String username = usernameEditText.getText().toString();
-                String password = passwordEditText.getText().toString();
-
-
-                if (username.isEmpty() || password.isEmpty()) {
-                    Toast.makeText(LoginActivity.this, "Please enter both username and password", Toast.LENGTH_SHORT).show();
-                } else {
-
-                    Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
-                }
+            public void onFailure(Call call, IOException e) {
+                runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Login failed!", Toast.LENGTH_SHORT).show());
             }
-        });
 
-
-        forgetPasswordTextView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                Toast.makeText(LoginActivity.this, "Password recovery", Toast.LENGTH_SHORT).show();
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    try {
+                        JSONObject jsonResponse = new JSONObject(response.body().string());
+                        String token = jsonResponse.getString("access_token");
+
+                        prefs.edit().putString("jwt_token", token).apply();
+                        runOnUiThread(() -> {
+                            Toast.makeText(LoginActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                            finish();
+                        });
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         });
     }

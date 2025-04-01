@@ -1,5 +1,6 @@
 package com.example.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -8,63 +9,77 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.io.IOException;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+
 
 public class MainActivity extends AppCompatActivity {
 
-    // Deklaracija UI elemenata
-    private TextView statusSkeniranja;
-    private Button btnUcitajBazu;
-    private Button btnUnistavanje;
-    private Button btnZavrsi;
-    private Button btnKreirajIzvestaj;
+    private static final String SERVER_URL = "http://192.168.1.100:5000/test";
+    private Button btnLoadDatabase;
+    private Button btnScan;
+    private Button btnFinish;
+    private Button btnSendReport;
+    private final OkHttpClient client = new OkHttpClient();
+    private String authToken = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);  // Ovo je tvoj XML fajl
+        setContentView(R.layout.activity_main);
 
-        // Inicijalizacija UI elemenata
-        statusSkeniranja = findViewById(R.id.status_skeniranja);
-        btnUcitajBazu = findViewById(R.id.btn_ucitaj_bazu);
-        btnUnistavanje =findViewById(R.id.btn_unistavanje);
-        btnZavrsi = findViewById(R.id.btn_zavrsi);
-        btnKreirajIzvestaj = findViewById(R.id.btn_kreiraj_izvestaj);
+        btnLoadDatabase = findViewById(R.id.btn_load_database);
+        btnScan =findViewById(R.id.btn_scan);
+        btnSendReport = findViewById(R.id.btn_create_report);
+        btnFinish = findViewById(R.id.btn_finish);
 
-        // Postavljanje početnog statusa
-        statusSkeniranja.setText("Status: Nema očitavanja");
+        btnLoadDatabase.setOnClickListener(v -> loadDatabase());
+        btnScan.setOnClickListener(v -> startActivity(new Intent(this, ScannerActivity.class)));
+        btnSendReport.setOnClickListener(v -> sendReport());
+        btnFinish.setOnClickListener(v -> finish());
 
-        // Klik događaj za "Učitaj Bazu"
-        btnUcitajBazu.setOnClickListener(new View.OnClickListener() {
+    }
+    private void loadDatabase() {
+        String SERVER_URL = "http://192.168.1.100:5000/load-database";
+        String token = getSharedPreferences("AppPrefs", MODE_PRIVATE).getString("jwt_token", "");
+
+        Request request = new Request.Builder()
+                .url(SERVER_URL)
+                .post(RequestBody.create("", MediaType.get("application/json; charset=utf-8")))
+                .addHeader("Authorization", "Bearer " + token)
+                .build();
+
+        new OkHttpClient().newCall(request).enqueue(new Callback() {
             @Override
-            public void onClick(View v) {
-                // Ovdje možeš dodati logiku za učitavanje baze
-                statusSkeniranja.setText("Status: Učitavanje baze...");
-                Toast.makeText(MainActivity.this, "Baza učitana", Toast.LENGTH_SHORT).show();
+            public void onFailure(Call call, IOException e) {
+                runOnUiThread(() -> Toast.makeText(MainActivity.this, "Error loading database", Toast.LENGTH_SHORT).show());
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                runOnUiThread(() -> Toast.makeText(MainActivity.this, "Database Loaded!", Toast.LENGTH_SHORT).show());
             }
         });
+    }
 
-        btnUnistavanje.setOnClickListener(new View.OnClickListener() {
+    private void sendReport() {
+        String SERVER_URL = "http://192.168.1.100:5000/generate-report";
+        new OkHttpClient().newCall(new Request.Builder().url(SERVER_URL).get().build()).enqueue(new Callback() {
             @Override
-            public void onClick(View v) {
-                // Ovdje možeš dodati logiku za uništavanje
-                statusSkeniranja.setText("Status: Uništavanje u toku...");
-                Toast.makeText(MainActivity.this, "Proces uništavanja pokrenut", Toast.LENGTH_SHORT).show();
+            public void onFailure(Call call, IOException e) {
+                runOnUiThread(() -> Toast.makeText(MainActivity.this, "Error generating report", Toast.LENGTH_SHORT).show());
             }
-        });
 
-        btnZavrsi.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                // Ovdje možeš dodati logiku za završavanje procesa
-                statusSkeniranja.setText("Status: Proces završen");
-                Toast.makeText(MainActivity.this, "Proces završen", Toast.LENGTH_SHORT).show();
-            }
-        });
-        btnKreirajIzvestaj.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                statusSkeniranja.setText("Status: Kreiranje izveštaja...");
-                Toast.makeText(MainActivity.this, "Izveštaj kreiran", Toast.LENGTH_SHORT).show();
+            public void onResponse(Call call, Response response) throws IOException {
+                runOnUiThread(() -> Toast.makeText(MainActivity.this, "Report Sent!", Toast.LENGTH_SHORT).show());
             }
         });
     }
