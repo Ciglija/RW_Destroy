@@ -130,30 +130,45 @@ def scan_box():
         return jsonify({"error": "Internal server error"}), 500
 
 
-@app.route('/admin-unlock', methods=['POST'])
+@app.route('/admin-auth', methods=['POST'])
 @jwt_required()
-def admin_unlock():
-    current_user = get_jwt_identity()
+def admin_auth():
+    try:
+        current_user = get_jwt_identity()
+        data = request.get_json()
 
-    user = pd.read_sql(f"SELECT * FROM users WHERE username = '{current_user}'", con=engine)
+        provided_username = data.get('admin_username')
+        provided_password = data.get('admin_password')
 
-    if user.empty:
-        return jsonify({"error": "User not found"}), 404
+        if not provided_username or not provided_password:
+            return jsonify({"error": "Both username and password are required"}), 400
 
-    if user.iloc[0]['status'] != 'Admin' or user.iloc[0]['admin_code_info'] == 'Nema':
-        return jsonify({"error": "Admin access required"}), 403
+        user_query = text("SELECT * FROM users WHERE username = :username")
+        user = pd.read_sql(user_query, con=engine, params={'username': current_user})
 
-    admin_code_info = user.iloc[0]['admin_code_info']
-    if not admin_code_info.startswith('Ima sifra '):
-        return jsonify({"error": "Invalid admin code format"}), 400
+        if user.empty:
+            return jsonify({"error": "User not found"}), 404
 
-    stored_admin_code = admin_code_info.replace('Ima sifra ', '').strip()
-    provided_code = request.json.get('admin_code')
+        if user.iloc[0]['status'] != 'Admin' or user.iloc[0]['admin_code_info'] == 'Nema':
+            return jsonify({"error": "Admin access required"}), 403
 
-    if provided_code == stored_admin_code:
-        return jsonify({"message": "Admin privileges granted"}), 200
-    else:
-        return jsonify({"error": "Invalid admin code"}), 403
+
+        admin_username = user.iloc[0]['username']
+        if provided_username != admin_username:
+            return jsonify({"error": "Invalid admin username"}), 403
+
+        admin_code_info = user.iloc[0]['admin_code_info']
+        if not admin_code_info.startswith('Ima sifra '):
+            return jsonify({"error": "Invalid admin code format"}), 400
+
+        stored_admin_code = admin_code_info.replace('Ima sifra ', '').strip()
+        if provided_password == stored_admin_code:
+            return jsonify({"message": "Admin privileges granted"}), 200
+        else:
+            return jsonify({"error": "Invalid admin password"}), 403
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route('/generate-report', methods=['GET'])
