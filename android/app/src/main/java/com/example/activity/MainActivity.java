@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
     private void loadDatabase() {
-        String SERVER_URL = "http://10.0.2.2:5000/load-database";
+        String SERVER_URL = "http://192.168.0.30:5000/load-database";
         String token = getSharedPreferences("AppPrefs", MODE_PRIVATE).getString("jwt_token", "");
 
         Request request = new Request.Builder()
@@ -56,27 +56,27 @@ public class MainActivity extends AppCompatActivity {
         new OkHttpClient().newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                runOnUiThread(() -> Toast.makeText(MainActivity.this, "Error loading database", Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(MainActivity.this, "Greska Internet!", Toast.LENGTH_SHORT).show());
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                runOnUiThread(() -> Toast.makeText(MainActivity.this, "Database Loaded!", Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(MainActivity.this, "Uspesno ucitana baza!", Toast.LENGTH_SHORT).show());
             }
         });
     }
 
     private void sendReport() {
-        String SERVER_URL = "http://10.0.2.2:5000/generate-report";
+        String SERVER_URL = "http://192.168.0.30:5000/generate-report";
         new OkHttpClient().newCall(new Request.Builder().url(SERVER_URL).get().build()).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                runOnUiThread(() -> Toast.makeText(MainActivity.this, "Error generating report", Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(MainActivity.this, "Greska Internet!", Toast.LENGTH_SHORT).show());
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                runOnUiThread(() -> Toast.makeText(MainActivity.this, "Report Sent!", Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(MainActivity.this, "Report poslat!", Toast.LENGTH_SHORT).show());
             }
         });
     }

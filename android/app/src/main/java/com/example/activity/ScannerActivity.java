@@ -5,19 +5,14 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
-import android.view.View;
+import android.util.Log;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.ListView;
-import android.widget.TextView;
-
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,44 +24,51 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import org.json.JSONObject;
 
 public class ScannerActivity extends AppCompatActivity {
 
     private ListView listView;
     private ArrayList<String> scannedBoxes = new ArrayList<>();
     private ArrayAdapter<String> adapter;
-    private static final String SCAN_ACTION = "com.symbol.datawedge.scanner.ACTION";
-    private static final String BARCODE_DATA = "com.symbol.datawedge.data_string";
     private String token;
 
-    @SuppressLint("UnspecifiedRegisterReceiverFlag")
+    private static final String TAG = "BarcodeScanner";
+    private static final String DATAWEDGE_SCANNER_OUTPUT_ACTION = "com.symbol.datawedge.scanner.ACTION";
+    private static final String BARCODE_DATA = "com.symbol.datawedge.data_string";
+
+    private BroadcastReceiver barcodeReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String barcode = intent.getStringExtra(BARCODE_DATA);
+            if (barcode != null && !barcode.isEmpty()) {
+                Log.d(TAG, "Scanned barcode: " + barcode);
+                sendBarcodeToServer(barcode);
+
+            } else {
+                Log.d(TAG, "Received scan intent but no barcode data found");
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);;
         setContentView(R.layout.activity_scanner);
 
         listView = findViewById(R.id.barcode_list);
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, scannedBoxes);
         listView.setAdapter(adapter);
-
         token = getSharedPreferences("AppPrefs", MODE_PRIVATE).getString("jwt_token", "");
 
         IntentFilter filter = new IntentFilter();
-        filter.addAction(SCAN_ACTION);
-        registerReceiver(barcodeReceiver, filter);
-    }
+        filter.addAction(DATAWEDGE_SCANNER_OUTPUT_ACTION);
+        filter.addCategory(Intent.CATEGORY_DEFAULT);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            registerReceiver(barcodeReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
 
-    private final BroadcastReceiver barcodeReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.hasExtra(BARCODE_DATA)) {
-                String barcode = intent.getStringExtra(BARCODE_DATA);
-                scannedBoxes.add(barcode);
-                adapter.notifyDataSetChanged();
-                sendBarcodeToServer(barcode);
-            }
         }
-    };
+    }
 
     private void sendBarcodeToServer(String barcode) {
         try {
@@ -99,6 +101,11 @@ public class ScannerActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(barcodeReceiver);
+        try {
+            unregisterReceiver(barcodeReceiver);
+            Log.d(TAG, "Receiver unregistered");
+        } catch (IllegalArgumentException e) {
+            Log.e(TAG, "Receiver not registered", e);
+        }
     }
 }

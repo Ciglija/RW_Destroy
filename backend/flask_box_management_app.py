@@ -98,6 +98,7 @@ def scan_box():
         )
 
         if box.empty:
+            print("Nema kutije")
             return jsonify({"status": "invalid", "message": "❌ Box invalid"}), 404
 
         scan_time = pd.Timestamp.now().strftime('%Y-%m-%d %H:%M:%S')
