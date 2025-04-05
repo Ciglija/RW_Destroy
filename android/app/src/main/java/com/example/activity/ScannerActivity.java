@@ -12,12 +12,15 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.Observer;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
@@ -37,11 +40,11 @@ public class ScannerActivity extends AppCompatActivity {
     private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
 
     private ListView listView;
-    private ArrayList<String> scannedBoxes = new ArrayList<>();
     private ArrayAdapter<String> adapter;
     private String token;
     private OkHttpClient httpClient;
     private BroadcastReceiver barcodeReceiver;
+    private ScannerViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,13 +54,35 @@ public class ScannerActivity extends AppCompatActivity {
         initializeComponents();
         setupHttpClient();
         setupBarcodeReceiver();
+        setupObservers();
     }
 
     private void initializeComponents() {
+        viewModel = new ViewModelProvider(this).get(ScannerViewModel.class);
         listView = findViewById(R.id.barcode_list);
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, scannedBoxes);
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, new ArrayList<>());
         listView.setAdapter(adapter);
         token = getSharedPreferences("AppPrefs", MODE_PRIVATE).getString("jwt_token", "");
+    }
+
+    private void setupObservers() {
+        viewModel.getScannedBoxesLiveData().observe(this, new Observer<List<String>>() {
+            @Override
+            public void onChanged(List<String> barcodes) {
+                adapter.clear();
+                adapter.addAll(barcodes);
+                adapter.notifyDataSetChanged();
+            }
+        });
+
+        viewModel.getToastMessage().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(String message) {
+                if (message != null && !message.isEmpty()) {
+                    Toast.makeText(ScannerActivity.this, message, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     private void setupHttpClient() {
@@ -75,7 +100,8 @@ public class ScannerActivity extends AppCompatActivity {
                 if (intent != null && DATAWEDGE_SCANNER_OUTPUT_ACTION.equals(intent.getAction())) {
                     String barcode = intent.getStringExtra(BARCODE_DATA);
                     if (barcode != null && !barcode.isEmpty()) {
-                        handleScannedBarcode(barcode);
+                        viewModel.handleNewBarcode(barcode);
+                        sendBarcodeToServer(barcode);
                     }
                 }
             }
@@ -86,16 +112,7 @@ public class ScannerActivity extends AppCompatActivity {
         filter.addCategory(Intent.CATEGORY_DEFAULT);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             registerReceiver(barcodeReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
-
         }
-    }
-
-    private void handleScannedBarcode(String barcode) {
-        runOnUiThread(() -> {
-            scannedBoxes.add(barcode);
-            adapter.notifyDataSetChanged();
-        });
-        sendBarcodeToServer(barcode);
     }
 
     private void sendBarcodeToServer(String barcode) {
@@ -113,20 +130,17 @@ public class ScannerActivity extends AppCompatActivity {
             httpClient.newCall(request).enqueue(new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
-                    runOnUiThread(() -> {
-                        Toast.makeText(ScannerActivity.this, "Greška sa internetom!", Toast.LENGTH_SHORT).show();
-                        blockScanner();
-                    });
+                    viewModel.showToast("Greška sa internetom!");
+                    viewModel.setBlockScanner(true);
                 }
 
                 @Override
-                public void onResponse(Call call, Response response) throws IOException {
+                public void onResponse(Call call, Response response) {
                     try {
                         if (!response.isSuccessful()) {
-                            runOnUiThread(() -> blockScanner());
+                            viewModel.setBlockScanner(true);
                         } else {
-                            runOnUiThread(() ->
-                                    Toast.makeText(ScannerActivity.this, "Uspešno skeniranje!", Toast.LENGTH_SHORT).show());
+                            viewModel.showToast("Uspešno skeniranje!");
                         }
                     } finally {
                         response.close();
@@ -134,70 +148,7 @@ public class ScannerActivity extends AppCompatActivity {
                 }
             });
         } catch (JSONException e) {
-            Log.e(TAG, "Error creating JSON", e);
-            runOnUiThread(() -> Toast.makeText(this, "Greška pri obradi barkoda", Toast.LENGTH_SHORT).show());
-        }
-    }
-
-    private void blockScanner() {
-        AlertDialogHelper.showAdminAuthDialog(ScannerActivity.this, new AlertDialogHelper.AdminAuthCallback() {
-            @Override
-            public void onCredentialsEntered(String username, String password) {
-                checkAdminCredentials(username, password, isCorrect -> {
-                    if (isCorrect) {
-                        runOnUiThread(() ->
-                                Toast.makeText(ScannerActivity.this, "Rad nastavljen ✅", Toast.LENGTH_SHORT).show());
-                    } else {
-                        runOnUiThread(() -> {
-                            Toast.makeText(ScannerActivity.this, "Pogrešni podaci!", Toast.LENGTH_SHORT).show();
-                            blockScanner();
-                        });
-                    }
-                });
-            }
-
-            @Override
-            public void onDialogCanceled() {
-                runOnUiThread(() ->
-                        Toast.makeText(ScannerActivity.this, "Potrebna je administratorska dozvola", Toast.LENGTH_SHORT).show());
-            }
-        });
-    }
-
-    private void checkAdminCredentials(String username, String password, PasswordCheckCallback callback) {
-        try {
-            JSONObject json = new JSONObject();
-            json.put("admin_username", username);
-            json.put("admin_password", password);
-
-            RequestBody body = RequestBody.create(json.toString(), JSON);
-            Request request = new Request.Builder()
-                    .url(BASE_URL + "admin-auth")
-                    .post(body)
-                    .build();
-
-            httpClient.newCall(request).enqueue(new Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
-                    runOnUiThread(() -> {
-                        Toast.makeText(ScannerActivity.this, "Greška sa internetom!", Toast.LENGTH_SHORT).show();
-                        callback.onResult(false);
-                    });
-                }
-
-                @Override
-                public void onResponse(Call call, Response response) throws IOException {
-                    try {
-                        boolean success = response.isSuccessful();
-                        runOnUiThread(() -> callback.onResult(success));
-                    } finally {
-                        response.close();
-                    }
-                }
-            });
-        } catch (JSONException e) {
-            Log.e(TAG, "Error creating admin auth JSON", e);
-            runOnUiThread(() -> callback.onResult(false));
+            viewModel.showToast("Greška pri obradi barkoda");
         }
     }
 
@@ -211,9 +162,5 @@ public class ScannerActivity extends AppCompatActivity {
         } catch (IllegalArgumentException e) {
             Log.e(TAG, "Receiver not registered", e);
         }
-    }
-
-    interface PasswordCheckCallback {
-        void onResult(boolean isCorrect);
     }
 }
