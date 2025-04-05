@@ -25,7 +25,6 @@ public class MainActivity extends AppCompatActivity {
     private Button btnScan;
     private Button btnFinish;
     private Button btnSendReport;
-    private String authToken = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,8 +59,8 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                runOnUiThread(() -> Toast.makeText(MainActivity.this, "Uspesno ucitana baza!", Toast.LENGTH_SHORT).show());
+            public void onResponse(Call call, Response response) {
+                runOnUiThread(() -> Toast.makeText(MainActivity.this, "Uspesno učitana baza!", Toast.LENGTH_SHORT).show());
             }
         });
     }
@@ -75,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(Call call, Response response){
                 runOnUiThread(() -> Toast.makeText(MainActivity.this, "Report poslat!", Toast.LENGTH_SHORT).show());
             }
         });

@@ -3,15 +3,11 @@ package com.example.activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
-
-import com.google.android.material.button.MaterialButton;
 
 import org.json.JSONObject;
 
@@ -48,8 +44,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void loadUsers() {
-        String json = "{}";
-        RequestBody body = RequestBody.create(json, MediaType.get("application/json; charset=utf-8"));
+        RequestBody body = RequestBody.create("{}", MediaType.get("application/json; charset=utf-8"));
         Request request = new Request.Builder()
                 .url("http://192.168.0.30:5000/import-users")
                 .post(body)
@@ -62,7 +57,7 @@ public class LoginActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(Call call, Response response) {
                 if (!response.isSuccessful()) {
                     runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Korisnici nisu učitani molimo vas da restartujete aplikaciju.", Toast.LENGTH_SHORT).show());
                 }
@@ -100,7 +95,6 @@ public class LoginActivity extends AppCompatActivity {
 
                         prefs.edit().putString("jwt_token", token).apply();
                         runOnUiThread(() -> {
-                            Toast.makeText(LoginActivity.this, "Uspešno ste se ulogovali!", Toast.LENGTH_SHORT).show();
                             startActivity(new Intent(LoginActivity.this, MainActivity.class));
                             finish();
                         });

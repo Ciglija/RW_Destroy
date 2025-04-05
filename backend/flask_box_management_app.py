@@ -11,14 +11,13 @@ from datetime import timedelta
 
 app = Flask(__name__)
 
-app.config["JWT_SECRET_KEY"] = "Kkey123"
+app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
 jwt = JWTManager(app)
 
 os.makedirs('backend/database', exist_ok=True)
 engine = create_engine('sqlite:///backend/database/RWdestroydb.db')
 
-# File paths
 USER_FILE_PATH = 'backend/excel_files/users.xlsx'
 BOX_DB_FILE_PATH = 'backend/excel_files/boxes.xlsx'
 REPORT_FILE_PATH = 'backend/reports/scanned_boxes_report.xlsx'
@@ -33,7 +32,8 @@ def login():
     if not username or not password:
         return jsonify({"error": "Missing username or password"}), 400
 
-    user = pd.read_sql(f"SELECT * FROM users WHERE username = '{username}'", con=engine)
+    user_query = text("SELECT * FROM users WHERE username = :username")
+    user = pd.read_sql(user_query, con=engine, params={'username': username})
 
     if user.empty or not check_password_hash(user.iloc[0]['password'], password):
         return jsonify({"error": "Invalid credentials"}), 401
@@ -99,7 +99,7 @@ def scan_box():
 
         if box.empty:
             print("Nema kutije")
-            return jsonify({"status": "invalid", "message": "❌ Box invalid"}), 404
+            return jsonify({"status": "invalid", "message": "Box invalid"}), 404
 
         scan_time = pd.Timestamp.now().strftime('%Y-%m-%d %H:%M:%S')
 
@@ -121,7 +121,7 @@ def scan_box():
 
         return jsonify({
             "status": "valid",
-            "message": "✅ Box scanned successfully",
+            "message": "Box scanned successfully",
             "scanned_by": current_user,
             "scan_time": scan_time
         }), 200
@@ -131,38 +131,32 @@ def scan_box():
 
 
 @app.route('/admin-auth', methods=['POST'])
-@jwt_required()
 def admin_auth():
     try:
-        current_user = get_jwt_identity()
         data = request.get_json()
 
-        provided_username = data.get('admin_username')
-        provided_password = data.get('admin_password')
+        username = data.get('admin_username')
+        password = data.get('admin_password')
 
-        if not provided_username or not provided_password:
+        if not username or not password:
             return jsonify({"error": "Both username and password are required"}), 400
 
         user_query = text("SELECT * FROM users WHERE username = :username")
-        user = pd.read_sql(user_query, con=engine, params={'username': current_user})
+        user = pd.read_sql(user_query, con=engine, params={'username': username})
 
         if user.empty:
-            return jsonify({"error": "User not found"}), 404
+            return jsonify({"error": "Admin not found"}), 404
 
         if user.iloc[0]['status'] != 'Admin' or user.iloc[0]['admin_code_info'] == 'Nema':
             return jsonify({"error": "Admin access required"}), 403
 
-
-        admin_username = user.iloc[0]['username']
-        if provided_username != admin_username:
-            return jsonify({"error": "Invalid admin username"}), 403
 
         admin_code_info = user.iloc[0]['admin_code_info']
         if not admin_code_info.startswith('Ima sifra '):
             return jsonify({"error": "Invalid admin code format"}), 400
 
         stored_admin_code = admin_code_info.replace('Ima sifra ', '').strip()
-        if provided_password == stored_admin_code:
+        if password == stored_admin_code:
             return jsonify({"message": "Admin privileges granted"}), 200
         else:
             return jsonify({"error": "Invalid admin password"}), 403
@@ -174,7 +168,8 @@ def admin_auth():
 @app.route('/generate-report', methods=['GET'])
 def generate_report():
     try:
-        all_boxes = pd.read_sql('SELECT * FROM boxes', con=engine)
+        boxes_query = text("SELECT * FROM boxes")
+        all_boxes = pd.read_sql(boxes_query, con=engine)
         print(all_boxes)
         all_boxes['status'] = all_boxes['status'].apply(
             lambda x: 'True' if x else 'False'
