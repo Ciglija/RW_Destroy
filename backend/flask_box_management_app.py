@@ -71,7 +71,8 @@ def load_database():
             'Tura': 'batch'
         }, inplace=True)
 
-        df['status'] = 0
+        df['status'] = False
+        df['present'] = True
         df['scanned_by'] = None
         df['scan_time'] = None
 
@@ -84,47 +85,51 @@ def load_database():
 @app.route('/scan-box', methods=['POST'])
 @jwt_required()
 def scan_box():
-    current_user = get_jwt_identity()
-    box_code = request.json.get('box_code')
-
-    if not box_code:
-        return jsonify({"error": "No box code provided"}), 400
-
     try:
-        box = pd.read_sql(
-            "SELECT * FROM boxes WHERE box = ?",
-            con=engine,
-            params=(box_code,)
-        )
+        current_user = get_jwt_identity()
+        box_code = request.json.get('box_code')
 
-        if box.empty:
-            print("Nema kutije")
-            return jsonify({"status": "invalid", "message": "Box invalid"}), 404
+        if not box_code:
+            return jsonify({"error": "Box code is required"}), 400
 
         scan_time = pd.Timestamp.now().strftime('%Y-%m-%d %H:%M:%S')
+        params = {
+            'scanned_by': current_user,
+            'scan_time': scan_time,
+            'box_code': box_code
+        }
+        box = pd.read_sql(
+            "SELECT * FROM boxes WHERE box = :box",
+            con=engine,
+            params={'box': box_code}
+        )
+        if not box.empty :
+            query = """
+                UPDATE boxes 
+                SET status = TRUE, 
+                    scanned_by = :scanned_by, 
+                    scan_time = :scan_time 
+                WHERE box = :box_code
+            """
+        else:
+            query = """
+                INSERT INTO boxes (box, status, scanned_by, scan_time, present)
+                VALUES (:box_code, TRUE, :scanned_by, :scan_time, FALSE)
+            """
+
+
 
         with engine.begin() as connection:
-            connection.execute(
-                text("""
-                    UPDATE boxes 
-                    SET status = 1, 
-                        scanned_by = :scanned_by, 
-                        scan_time = :scan_time 
-                    WHERE box = :box_code
-                """),
-                {
-                    'scanned_by': current_user,
-                    'scan_time': scan_time,
-                    'box_code': box_code
-                }
-            )
+            connection.execute(text(query), params)
 
-        return jsonify({
-            "status": "valid",
-            "message": "Box scanned successfully",
-            "scanned_by": current_user,
-            "scan_time": scan_time
-        }), 200
+        if not box.empty:
+            return jsonify({
+            "message": "Box scanned successfully"
+            }), 200
+        else:
+            return jsonify({
+            "message": "Box was not present in the database"
+            }), 400
 
     except Exception as e:
         return jsonify({"error": "Internal server error"}), 500
@@ -164,6 +169,15 @@ def admin_auth():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/get-missing-count', methods=['GET'])
+def get_missing_count():
+    try:
+        with engine.connect() as connection:
+            result = connection.execute(text("SELECT COUNT(*) FROM boxes WHERE status = FALSE"))
+            count = result.scalar()
+            return jsonify({"unscanned": count}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/generate-report', methods=['GET'])
 def generate_report():
@@ -171,11 +185,11 @@ def generate_report():
         boxes_query = text("SELECT * FROM boxes")
         all_boxes = pd.read_sql(boxes_query, con=engine)
         print(all_boxes)
-        all_boxes['status'] = all_boxes['status'].apply(
+        all_boxes['present'] = all_boxes['status'].apply(
             lambda x: 'True' if x else 'False'
         )
 
-        all_boxes[['client', 'box', 'batch', 'scanned_by', 'scan_time', 'status']] \
+        all_boxes[['client', 'box', 'batch', 'scanned_by', 'scan_time', 'present']] \
             .to_excel(REPORT_FILE_PATH, index=False)
 
         return jsonify({

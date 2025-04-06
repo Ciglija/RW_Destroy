@@ -8,13 +8,17 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.Observer;
 
+
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -31,6 +35,7 @@ public class ScannerActivity extends AppCompatActivity {
     private static final String BARCODE_DATA = "com.symbol.datawedge.data_string";
 
     private ListView listView;
+    private Button btnFinish;
     private ArrayAdapter<String> adapter;
     private String token;
     private BroadcastReceiver barcodeReceiver;
@@ -42,17 +47,23 @@ public class ScannerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_scanner);
 
         initializeComponents();
+        initializeEvents();
         setupBarcodeReceiver();
         setupObservers();
     }
 
     private void initializeComponents() {
+        listView = findViewById(R.id.barcode_list);
+        btnFinish = findViewById(R.id.btn_finish);
+        token = getSharedPreferences("AppPrefs", MODE_PRIVATE).getString("jwt_token", "");
         viewModel = new ViewModelProvider(this).get(ScannerViewModel.class);
         viewModel.updateBarcodesFromStorage();
-        listView = findViewById(R.id.barcode_list);
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, new ArrayList<>());
         listView.setAdapter(adapter);
-        token = getSharedPreferences("AppPrefs", MODE_PRIVATE).getString("jwt_token", "");
+    }
+
+    private void initializeEvents() {
+        btnFinish.setOnClickListener(v -> finishScanning());
     }
 
     private void setupObservers() {
@@ -163,6 +174,58 @@ public class ScannerActivity extends AppCompatActivity {
                     response.close();
                 }
             }
+        });
+    }
+
+    private void finishScanning() {
+        ApiClient.getUnscannedCount(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                runOnUiThread(() -> {
+                    Toast.makeText(ScannerActivity.this, "Greška sa internetom!", Toast.LENGTH_SHORT).show();
+                });
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String responseBody = null;
+
+                try {
+                    if (response.isSuccessful() && response.body() != null) {
+                        responseBody = response.body().string();
+                    }
+                } catch (Exception e) {
+                    Log.e("API_RESPONSE", "Greska prilikom citanja odgovora", e);
+                }
+
+                String finalResponseBody = responseBody;
+                runOnUiThread(() -> {
+                    try {
+                        if (finalResponseBody != null) {
+                            Log.d("API_RESPONSE", "Body: " + finalResponseBody);
+                            int unscannedCount = new JSONObject(finalResponseBody).getInt("unscanned");
+
+                            BoxAlertDialog.showUnreadBoxesAlert(ScannerActivity.this,
+                                    unscannedCount,
+                                    new BoxAlertDialog.AlertResponseListener() {
+                                        @Override
+                                        public void onContinueSelected() { }
+
+                                        @Override
+                                        public void onExitSelected() {
+                                            finish();
+                                        }
+                                    });
+                        } else {
+                            Toast.makeText(ScannerActivity.this, "Greška u server odgovoru!", Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (Exception e) {
+                        Toast.makeText(ScannerActivity.this, "Greška u obradi podataka!", Toast.LENGTH_SHORT).show();
+                        Log.e("API_RESPONSE", "Parsiranje nije uspelo", e);
+                    }
+                });
+            }
+
         });
     }
     @Override

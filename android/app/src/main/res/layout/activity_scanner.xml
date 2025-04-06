@@ -21,19 +21,19 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_below="@id/scanned_barcode_text_view"
-        android:layout_above="@id/status_scanner"
+        android:layout_above="@id/btn_finish"
         android:divider="@android:color/darker_gray"
         android:dividerHeight="1dp"/>
 
-    <TextView
-        android:id="@+id/status_scanner"
-        android:text="Status: "
-        android:layout_width="wrap_content"
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_finish"
+        android:text="Završi"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:paddingTop="8dp" />
+        android:background="@drawable/button_background"
+        android:textColor="#FFFFFF"
+        android:padding="12dp"
+        android:layout_marginBottom="12dp"
+        android:layout_alignParentBottom="true" />
 
 </RelativeLayout>

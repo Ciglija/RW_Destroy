@@ -17,7 +17,6 @@ import okhttp3.Response;
 public class MainActivity extends AppCompatActivity {
     private Button btnLoadDatabase;
     private Button btnScan;
-    private Button btnFinish;
     private Button btnSendReport;
 
     @Override
@@ -33,7 +32,6 @@ public class MainActivity extends AppCompatActivity {
         btnLoadDatabase = findViewById(R.id.btn_load_database);
         btnScan = findViewById(R.id.btn_scan);
         btnSendReport = findViewById(R.id.btn_create_report);
-        btnFinish = findViewById(R.id.btn_finish);
     }
 
     private void initializeEvents() {
@@ -44,7 +42,6 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
         btnSendReport.setOnClickListener(v -> sendReport());
-        btnFinish.setOnClickListener(v -> finish());
     }
 
     private void loadDatabase() {

@@ -18,7 +18,7 @@
 
     <Space
         android:layout_width="match_parent"
-        android:layout_height="100dp" />
+        android:layout_height="60dp" />
 
 
     <androidx.appcompat.widget.AppCompatButton
@@ -50,16 +50,6 @@
         android:textColor="#FFFFFF"
         android:padding="12dp"
         android:layout_marginBottom="12dp" />
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btn_finish"
-        android:text="Zavrsi"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/button_background"
-        android:textColor="#FFFFFF"
-        android:padding="12dp"
-        android:layout_marginBottom="16dp" />
 
 
 </LinearLayout>

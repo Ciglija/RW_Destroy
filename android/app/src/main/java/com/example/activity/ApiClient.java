@@ -88,4 +88,7 @@ public class ApiClient {
         } catch (JSONException ignored) {
         }
     }
+    public static void getUnscannedCount(Callback callback) {
+        client.newCall(buildGetRequest("get-missing-count")).enqueue(callback);
+    }
 }
