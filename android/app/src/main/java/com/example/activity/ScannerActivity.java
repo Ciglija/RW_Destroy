@@ -36,13 +36,10 @@ public class ScannerActivity extends AppCompatActivity {
     private static final String TAG = "ScannerActivity";
     private static final String DATAWEDGE_SCANNER_OUTPUT_ACTION = "com.symbol.datawedge.scanner.ACTION";
     private static final String BARCODE_DATA = "com.symbol.datawedge.data_string";
-    private static final String BASE_URL = "http://192.168.0.30:5000/";
-    private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
 
     private ListView listView;
     private ArrayAdapter<String> adapter;
     private String token;
-    private OkHttpClient httpClient;
     private BroadcastReceiver barcodeReceiver;
     private ScannerViewModel viewModel;
 
@@ -52,7 +49,6 @@ public class ScannerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_scanner);
 
         initializeComponents();
-        setupHttpClient();
         setupBarcodeReceiver();
         setupObservers();
     }
@@ -87,14 +83,6 @@ public class ScannerActivity extends AppCompatActivity {
         });
     }
 
-    private void setupHttpClient() {
-        httpClient = new OkHttpClient.Builder()
-                .connectTimeout(15, TimeUnit.SECONDS)
-                .readTimeout(15, TimeUnit.SECONDS)
-                .writeTimeout(15, TimeUnit.SECONDS)
-                .build();
-    }
-
     private void setupBarcodeReceiver() {
         barcodeReceiver = new BroadcastReceiver() {
             @Override
@@ -119,17 +107,8 @@ public class ScannerActivity extends AppCompatActivity {
 
     private void sendBarcodeToServer(String barcode) {
         try {
-            JSONObject json = new JSONObject();
-            json.put("box_code", barcode);
 
-            RequestBody body = RequestBody.create(json.toString(), JSON);
-            Request request = new Request.Builder()
-                    .url(BASE_URL + "scan-box")
-                    .post(body)
-                    .addHeader("Authorization", "Bearer " + token)
-                    .build();
-
-            httpClient.newCall(request).enqueue(new Callback() {
+            ApiClient.sendBarcode(token, barcode,new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
                     viewModel.showToast("Greška sa internetom!");
@@ -138,10 +117,10 @@ public class ScannerActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call call, Response response) {
                     try {
-                        if (!response.isSuccessful()) {
-                            runOnUiThread(() -> blockScanner());
-                        } else {
+                        if (response.isSuccessful()) {
                             viewModel.showToast("Uspešno skeniranje!");
+                        } else {
+                            runOnUiThread(() -> blockScanner());
                         }
                     } finally {
                         response.close();
@@ -162,7 +141,6 @@ public class ScannerActivity extends AppCompatActivity {
                                 Toast.makeText(ScannerActivity.this, "Rad nastavljen ✅", Toast.LENGTH_SHORT).show());
                     } else {
                         runOnUiThread(() -> {
-                            Toast.makeText(ScannerActivity.this, "Pogrešni podaci!", Toast.LENGTH_SHORT).show();
                             blockScanner();
                         });
                     }
@@ -178,17 +156,7 @@ public class ScannerActivity extends AppCompatActivity {
     }
     private void checkAdminCredentials(String username, String password, PasswordCheckCallback callback) {
         try {
-            JSONObject json = new JSONObject();
-            json.put("admin_username", username);
-            json.put("admin_password", password);
-
-            RequestBody body = RequestBody.create(json.toString(), JSON);
-            Request request = new Request.Builder()
-                    .url(BASE_URL + "admin-auth")
-                    .post(body)
-                    .build();
-
-            httpClient.newCall(request).enqueue(new Callback() {
+            ApiClient.checkAdmin(username, password,new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
                     runOnUiThread(() -> {
@@ -200,8 +168,7 @@ public class ScannerActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
                     try {
-                        boolean success = response.isSuccessful();
-                        runOnUiThread(() -> callback.onResult(success));
+                        runOnUiThread(() -> callback.onResult(response.isSuccessful()));
                     } finally {
                         response.close();
                     }

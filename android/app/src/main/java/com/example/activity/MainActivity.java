@@ -2,34 +2,23 @@ package com.example.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 
 
 public class MainActivity extends AppCompatActivity {
-    private static final String BASE_URL = "http://192.168.0.30:5000/";
-    private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
     private Button btnLoadDatabase;
     private Button btnScan;
     private Button btnFinish;
     private Button btnSendReport;
-    private OkHttpClient httpClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +27,6 @@ public class MainActivity extends AppCompatActivity {
 
         initializeComponents();
         initializeEvents();
-        setupHttpClient();
     }
 
     private void initializeComponents() {
@@ -59,26 +47,11 @@ public class MainActivity extends AppCompatActivity {
         btnFinish.setOnClickListener(v -> finish());
     }
 
-    private void setupHttpClient() {
-        httpClient = new OkHttpClient.Builder()
-                .connectTimeout(15, TimeUnit.SECONDS)
-                .readTimeout(15, TimeUnit.SECONDS)
-                .writeTimeout(15, TimeUnit.SECONDS)
-                .build();
-    }
     private void loadDatabase() {
-        String token = getSharedPreferences("AppPrefs", MODE_PRIVATE).getString("jwt_token", "");
-
-        Request request = new Request.Builder()
-                .url(BASE_URL + "load-database")
-                .post(RequestBody.create("", JSON))
-                .addHeader("Authorization", "Bearer " + token)
-                .build();
-
-        httpClient.newCall(request).enqueue(new Callback() {
+        ApiClient.loadDatabase(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                runOnUiThread(() -> Toast.makeText(MainActivity.this, "Greska Internet!", Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(MainActivity.this, "Greska Internet!", Toast.LENGTH_LONG).show());
             }
 
             @Override
@@ -90,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void sendReport() {
-        httpClient.newCall(new Request.Builder().url(BASE_URL + "generate-report").get().build()).enqueue(new Callback() {
+        ApiClient.generateReport(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 runOnUiThread(() -> Toast.makeText(MainActivity.this, "Greska Internet!", Toast.LENGTH_SHORT).show());

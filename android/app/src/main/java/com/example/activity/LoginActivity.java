@@ -13,28 +13,19 @@ import androidx.appcompat.widget.AppCompatButton;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 
 
 public class LoginActivity extends AppCompatActivity {
 
-    private static final String BASE_URL = "http://192.168.0.30:5000/";
-    private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
 
     private EditText usernameEditText;
     private EditText passwordEditText;
     private AppCompatButton loginButton;
     private SharedPreferences prefs;
-
-    private OkHttpClient httpClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +33,6 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         initializeComponents();
-        setupHttpClient();
         initializeEvents();
     }
     private void initializeComponents() {
@@ -56,31 +46,18 @@ public class LoginActivity extends AppCompatActivity {
         loadUsers();
         loginButton.setOnClickListener(v -> loginUserFun());
     }
-    private void setupHttpClient() {
-        httpClient = new OkHttpClient.Builder()
-                .connectTimeout(15, TimeUnit.SECONDS)
-                .readTimeout(15, TimeUnit.SECONDS)
-                .writeTimeout(15, TimeUnit.SECONDS)
-                .build();
-    }
-
     private void loadUsers() {
-        RequestBody body = RequestBody.create("{}",JSON);
-        Request request = new Request.Builder()
-                .url(BASE_URL + "import-users")
-                .post(body)
-                .build();
 
-        httpClient.newCall(request).enqueue(new Callback() {
+        ApiClient.loadUsers(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Greška u konekciji!", Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Greška u konekciji!", Toast.LENGTH_LONG).show());
             }
 
             @Override
             public void onResponse(Call call, Response response) {
                 if (!response.isSuccessful()) {
-                    runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Korisnici nisu učitani molimo vas da restartujete aplikaciju.", Toast.LENGTH_SHORT).show());
+                    runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Korisnici nisu učitani molimo vas da restartujete aplikaciju.", Toast.LENGTH_LONG).show());
                 }
                 response.close();
             }
@@ -96,18 +73,7 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
-        JSONObject json = new JSONObject();
-        try {
-            json.put("username", username);
-            json.put("password", password);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        RequestBody body = RequestBody.create(json.toString(), JSON);
-        Request request = new Request.Builder().url(BASE_URL + "login").post(body).build();
-
-        httpClient.newCall(request).enqueue(new Callback() {
+        ApiClient.loginUser(username, password, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Greška u konekciji!", Toast.LENGTH_SHORT).show());
@@ -117,10 +83,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()) {
                     try {
-                        JSONObject jsonResponse = new JSONObject(response.body().string());
-                        String token = jsonResponse.getString("access_token");
-
-                        prefs.edit().putString("jwt_token", token).apply();
+                        prefs.edit().putString("jwt_token",  new JSONObject(response.body().string()).getString("access_token")).apply();
                         runOnUiThread(() -> {
                             startActivity(new Intent(LoginActivity.this, MainActivity.class));
                             finish();

@@ -40,10 +40,6 @@ public class AlertDialogHelper {
                         } else {
                             callback.onCredentialsEntered(adminUsername, adminPassword);
                         }
-                    })
-                    .setNegativeButton("Odustani", (dialog, which) -> {
-                        callback.onDialogCanceled();
-                        dialog.dismiss();
                     });
 
             AlertDialog dialog = builder.create();
