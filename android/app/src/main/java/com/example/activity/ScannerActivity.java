@@ -58,7 +58,9 @@ public class ScannerActivity extends AppCompatActivity {
     }
 
     private void initializeComponents() {
+        BarcodeStorage.loadFromPreferences(this);
         viewModel = new ViewModelProvider(this).get(ScannerViewModel.class);
+        viewModel.updateBarcodesFromStorage();
         listView = findViewById(R.id.barcode_list);
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, new ArrayList<>());
         listView.setAdapter(adapter);
@@ -99,7 +101,7 @@ public class ScannerActivity extends AppCompatActivity {
             public void onReceive(Context context, Intent intent) {
                 if (intent != null && DATAWEDGE_SCANNER_OUTPUT_ACTION.equals(intent.getAction())) {
                     String barcode = intent.getStringExtra(BARCODE_DATA);
-                    if (barcode != null && !barcode.isEmpty()) {
+                    if (barcode != null && !barcode.isEmpty() && !BarcodeStorage.getScannedBarcodes().contains(barcode)) {
                         viewModel.handleNewBarcode(barcode);
                         sendBarcodeToServer(barcode);
                     }
@@ -131,14 +133,13 @@ public class ScannerActivity extends AppCompatActivity {
                 @Override
                 public void onFailure(Call call, IOException e) {
                     viewModel.showToast("Greška sa internetom!");
-                    viewModel.setBlockScanner(true);
                 }
 
                 @Override
                 public void onResponse(Call call, Response response) {
                     try {
                         if (!response.isSuccessful()) {
-                            viewModel.setBlockScanner(true);
+                            runOnUiThread(() -> blockScanner());
                         } else {
                             viewModel.showToast("Uspešno skeniranje!");
                         }
@@ -149,6 +150,65 @@ public class ScannerActivity extends AppCompatActivity {
             });
         } catch (JSONException e) {
             viewModel.showToast("Greška pri obradi barkoda");
+        }
+    }
+    private void blockScanner() {
+        AlertDialogHelper.showAdminAuthDialog(ScannerActivity.this, new AlertDialogHelper.AdminAuthCallback() {
+            @Override
+            public void onCredentialsEntered(String username, String password) {
+                checkAdminCredentials(username, password, isCorrect -> {
+                    if (isCorrect) {
+                        runOnUiThread(() ->
+                                Toast.makeText(ScannerActivity.this, "Rad nastavljen ✅", Toast.LENGTH_SHORT).show());
+                    } else {
+                        runOnUiThread(() -> {
+                            Toast.makeText(ScannerActivity.this, "Pogrešni podaci!", Toast.LENGTH_SHORT).show();
+                            blockScanner();
+                        });
+                    }
+                });
+            }
+
+            @Override
+            public void onDialogCanceled() {
+                runOnUiThread(() ->
+                        Toast.makeText(ScannerActivity.this, "Potrebna je administratorska dozvola", Toast.LENGTH_SHORT).show());
+            }
+        });
+    }
+    private void checkAdminCredentials(String username, String password, PasswordCheckCallback callback) {
+        try {
+            JSONObject json = new JSONObject();
+            json.put("admin_username", username);
+            json.put("admin_password", password);
+
+            RequestBody body = RequestBody.create(json.toString(), JSON);
+            Request request = new Request.Builder()
+                    .url(BASE_URL + "admin-auth")
+                    .post(body)
+                    .build();
+
+            httpClient.newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    runOnUiThread(() -> {
+                        Toast.makeText(ScannerActivity.this, "Greška sa internetom!", Toast.LENGTH_SHORT).show();
+                        callback.onResult(false);
+                    });
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    try {
+                        boolean success = response.isSuccessful();
+                        runOnUiThread(() -> callback.onResult(success));
+                    } finally {
+                        response.close();
+                    }
+                }
+            });
+        } catch (JSONException e) {
+            runOnUiThread(() -> callback.onResult(false));
         }
     }
 
@@ -162,5 +222,9 @@ public class ScannerActivity extends AppCompatActivity {
         } catch (IllegalArgumentException e) {
             Log.e(TAG, "Receiver not registered", e);
         }
+        BarcodeStorage.saveToPreferences(this);
+    }
+    interface PasswordCheckCallback {
+        void onResult(boolean isCorrect);
     }
 }

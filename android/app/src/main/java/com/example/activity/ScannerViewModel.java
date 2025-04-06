@@ -16,10 +16,8 @@ public class ScannerViewModel extends ViewModel {
     private final MutableLiveData<Boolean> blockScanner = new MutableLiveData<>(false);
 
     public void handleNewBarcode(String barcode) {
-        if (!scannedBarcodes.contains(barcode)) {
-            scannedBarcodes.add(barcode);
-            scannedBoxesLiveData.postValue(new ArrayList<>(scannedBarcodes));
-        }
+        BarcodeStorage.addBarcode(barcode);
+        scannedBoxesLiveData.postValue(BarcodeStorage.getBarcodes());
     }
 
     public LiveData<List<String>> getScannedBoxesLiveData() {
@@ -30,15 +28,10 @@ public class ScannerViewModel extends ViewModel {
         return toastMessage;
     }
 
-    public LiveData<Boolean> getBlockScanner() {
-        return blockScanner;
-    }
-
     public void showToast(String message) {
         toastMessage.postValue(message);
     }
 
-    public void setBlockScanner(boolean block) {
-        blockScanner.postValue(block);
-    }
+    public void updateBarcodesFromStorage() { scannedBoxesLiveData.postValue(BarcodeStorage.getBarcodes()); }
+
 }
