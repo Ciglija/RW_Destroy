@@ -15,20 +15,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.Observer;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class ScannerActivity extends AppCompatActivity {
@@ -54,7 +47,6 @@ public class ScannerActivity extends AppCompatActivity {
     }
 
     private void initializeComponents() {
-        BarcodeStorage.loadFromPreferences(this);
         viewModel = new ViewModelProvider(this).get(ScannerViewModel.class);
         viewModel.updateBarcodesFromStorage();
         listView = findViewById(R.id.barcode_list);
@@ -89,7 +81,7 @@ public class ScannerActivity extends AppCompatActivity {
             public void onReceive(Context context, Intent intent) {
                 if (intent != null && DATAWEDGE_SCANNER_OUTPUT_ACTION.equals(intent.getAction())) {
                     String barcode = intent.getStringExtra(BARCODE_DATA);
-                    if (barcode != null && !barcode.isEmpty() && !BarcodeStorage.getScannedBarcodes().contains(barcode)) {
+                    if (barcode != null && !barcode.isEmpty()) {
                         viewModel.handleNewBarcode(barcode);
                         sendBarcodeToServer(barcode);
                     }
@@ -106,31 +98,29 @@ public class ScannerActivity extends AppCompatActivity {
     }
 
     private void sendBarcodeToServer(String barcode) {
-        try {
 
-            ApiClient.sendBarcode(token, barcode,new Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
-                    viewModel.showToast("Greška sa internetom!");
-                }
+        ApiClient.sendBarcode(token, barcode, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                viewModel.showToast("Greška sa internetom!");
+            }
 
-                @Override
-                public void onResponse(Call call, Response response) {
-                    try {
-                        if (response.isSuccessful()) {
-                            viewModel.showToast("Uspešno skeniranje!");
-                        } else {
-                            runOnUiThread(() -> blockScanner());
-                        }
-                    } finally {
-                        response.close();
+            @Override
+            public void onResponse(Call call, Response response) {
+                try {
+                    if (response.isSuccessful()) {
+                        viewModel.showToast("Uspešno skeniranje!");
+                    } else {
+                        runOnUiThread(() -> blockScanner());
                     }
+                } finally {
+                    response.close();
                 }
-            });
-        } catch (JSONException e) {
-            viewModel.showToast("Greška pri obradi barkoda");
-        }
+            }
+        });
+
     }
+
     private void blockScanner() {
         AlertDialogHelper.showAdminAuthDialog(ScannerActivity.this, new AlertDialogHelper.AdminAuthCallback() {
             @Override
@@ -154,29 +144,34 @@ public class ScannerActivity extends AppCompatActivity {
             }
         });
     }
-    private void checkAdminCredentials(String username, String password, PasswordCheckCallback callback) {
-        try {
-            ApiClient.checkAdmin(username, password,new Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
-                    runOnUiThread(() -> {
-                        Toast.makeText(ScannerActivity.this, "Greška sa internetom!", Toast.LENGTH_SHORT).show();
-                        callback.onResult(false);
-                    });
-                }
 
-                @Override
-                public void onResponse(Call call, Response response) throws IOException {
-                    try {
-                        runOnUiThread(() -> callback.onResult(response.isSuccessful()));
-                    } finally {
-                        response.close();
-                    }
+    private void checkAdminCredentials(String username, String password, PasswordCheckCallback callback) {
+        ApiClient.checkAdmin(username, password, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                runOnUiThread(() -> {
+                    Toast.makeText(ScannerActivity.this, "Greška sa internetom!", Toast.LENGTH_SHORT).show();
+                    callback.onResult(false);
+                });
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                try {
+                    runOnUiThread(() -> callback.onResult(response.isSuccessful()));
+                } finally {
+                    response.close();
                 }
-            });
-        } catch (JSONException e) {
-            runOnUiThread(() -> callback.onResult(false));
-        }
+            }
+        });
+    }
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(intent);
+        finish();
     }
 
     @Override
@@ -189,8 +184,8 @@ public class ScannerActivity extends AppCompatActivity {
         } catch (IllegalArgumentException e) {
             Log.e(TAG, "Receiver not registered", e);
         }
-        BarcodeStorage.saveToPreferences(this);
     }
+
     interface PasswordCheckCallback {
         void onResult(boolean isCorrect);
     }

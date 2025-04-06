@@ -5,19 +5,26 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class ScannerViewModel extends ViewModel {
-    private final Set<String> scannedBarcodes = new HashSet<>();
-    private final MutableLiveData<List<String>> scannedBoxesLiveData = new MutableLiveData<>();
+    private final MutableLiveData<List<String>> scannedBoxesLiveData = new MutableLiveData<>(new ArrayList<>());
     private final MutableLiveData<String> toastMessage = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> blockScanner = new MutableLiveData<>(false);
 
     public void handleNewBarcode(String barcode) {
-        BarcodeStorage.addBarcode(barcode);
-        scannedBoxesLiveData.postValue(BarcodeStorage.getBarcodes());
+        if (BarcodeStorage.addBarcode(barcode)) {
+            List<String> current = scannedBoxesLiveData.getValue();
+            if (current != null) {
+                current.add(barcode);
+                scannedBoxesLiveData.postValue(new ArrayList<>(current));
+            } else {
+                List<String> newList = new ArrayList<>();
+                newList.add(barcode);
+                scannedBoxesLiveData.postValue(newList);
+            }
+        } else {
+            showToast("Already scanned.");
+        }
     }
 
     public LiveData<List<String>> getScannedBoxesLiveData() {
@@ -32,6 +39,7 @@ public class ScannerViewModel extends ViewModel {
         toastMessage.postValue(message);
     }
 
-    public void updateBarcodesFromStorage() { scannedBoxesLiveData.postValue(BarcodeStorage.getBarcodes()); }
-
+    public void updateBarcodesFromStorage() {
+        scannedBoxesLiveData.postValue(BarcodeStorage.getBarcodes());
+    }
 }

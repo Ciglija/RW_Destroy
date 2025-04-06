@@ -1,7 +1,5 @@
 package com.example.activity;
 
-import androidx.appcompat.app.AlertDialog;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -23,63 +21,71 @@ public class ApiClient {
             .writeTimeout(15, TimeUnit.SECONDS)
             .build();
 
-    public static void loadUsers(Callback callback) {
-        Request request = new Request.Builder()
-                .url(BASE_URL + "import-users")
-                .post(RequestBody.create("", JSON))
+
+    private static Request buildPostRequest(String endpoint, JSONObject jsonBody) {
+        RequestBody body = RequestBody.create(
+                jsonBody != null ? jsonBody.toString() : "", JSON
+        );
+        return new Request.Builder()
+                .url(BASE_URL + endpoint)
+                .post(body)
                 .build();
-        client.newCall(request).enqueue(callback);
     }
 
-    public static void loginUser(String username, String password, Callback callback)  {
-        try{
-            JSONObject json = new JSONObject();
-            json.put("username", username);
-            json.put("password", password);
-            Request request = new Request.Builder()
-                    .url(BASE_URL + "login")
-                    .post(RequestBody.create(json.toString(), JSON))
-                    .build();
-            client.newCall(request).enqueue(callback);
-        } catch(JSONException ignored){}
-    }
-
-    public static void loadDatabase(Callback callback) {
-        Request request = new Request.Builder()
-                .url(BASE_URL + "load-database")
-                .post(RequestBody.create("", JSON))
-                .build();
-        client.newCall(request).enqueue(callback);
-    }
-
-    public static void generateReport(Callback callback) {
-        Request request = new Request.Builder()
-                .url(BASE_URL + "generate-report")
+    private static Request buildGetRequest(String endpoint) {
+        return new Request.Builder()
+                .url(BASE_URL + endpoint)
                 .get()
                 .build();
-        client.newCall(request).enqueue(callback);
     }
 
-    public static void sendBarcode(String token, String barcode, Callback callback) throws JSONException {
-        JSONObject json = new JSONObject();
-        json.put("box_code", barcode);
-        RequestBody body = RequestBody.create(json.toString(), JSON);
-        Request request = new Request.Builder()
-                .url(BASE_URL + "scan-box")
+    private static Request buildAuthorizedPostRequest(String endpoint, JSONObject jsonBody, String token) {
+        RequestBody body = RequestBody.create(jsonBody.toString(), JSON);
+        return new Request.Builder()
+                .url(BASE_URL + endpoint)
                 .post(body)
                 .addHeader("Authorization", "Bearer " + token)
                 .build();
-        client.newCall(request).enqueue(callback);
     }
-    public static void checkAdmin(String username, String password, Callback callback) throws JSONException {
-        JSONObject json = new JSONObject();
-        json.put("admin_username", username);
-        json.put("admin_password", password);
-        RequestBody body = RequestBody.create(json.toString(), JSON);
-        Request request = new Request.Builder()
-                .url(BASE_URL + "admin-auth")
-                .post(body)
-                .build();
-        client.newCall(request).enqueue(callback);
+
+
+    public static void loadUsers(Callback callback) {
+        client.newCall(buildPostRequest("import-users", null)).enqueue(callback);
+    }
+
+    public static void loginUser(String username, String password, Callback callback) {
+        try {
+            JSONObject json = new JSONObject()
+                    .put("username", username)
+                    .put("password", password);
+            client.newCall(buildPostRequest("login", json)).enqueue(callback);
+        } catch (JSONException ignored) {
+        }
+    }
+
+    public static void loadDatabase(Callback callback) {
+        client.newCall(buildPostRequest("load-database", null)).enqueue(callback);
+    }
+
+    public static void generateReport(Callback callback) {
+        client.newCall(buildGetRequest("generate-report")).enqueue(callback);
+    }
+
+    public static void sendBarcode(String token, String barcode, Callback callback) {
+        try {
+            JSONObject json = new JSONObject().put("box_code", barcode);
+            client.newCall(buildAuthorizedPostRequest("scan-box", json, token)).enqueue(callback);
+        } catch (JSONException ignored) {
+        }
+    }
+
+    public static void checkAdmin(String username, String password, Callback callback) {
+        try {
+            JSONObject json = new JSONObject()
+                    .put("admin_username", username)
+                    .put("admin_password", password);
+            client.newCall(buildPostRequest("admin-auth", json)).enqueue(callback);
+        } catch (JSONException ignored) {
+        }
     }
 }

@@ -31,12 +31,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void initializeComponents() {
         btnLoadDatabase = findViewById(R.id.btn_load_database);
-        btnScan =findViewById(R.id.btn_scan);
+        btnScan = findViewById(R.id.btn_scan);
         btnSendReport = findViewById(R.id.btn_create_report);
         btnFinish = findViewById(R.id.btn_finish);
     }
 
-    private void initializeEvents(){
+    private void initializeEvents() {
         btnLoadDatabase.setOnClickListener(v -> loadDatabase());
         btnScan.setOnClickListener(v -> {
             Intent intent = new Intent(this, ScannerActivity.class);
@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onResponse(Call call, Response response){
+            public void onResponse(Call call, Response response) {
                 runOnUiThread(() -> Toast.makeText(MainActivity.this, "Report poslat!", Toast.LENGTH_SHORT).show());
                 response.close();
             }

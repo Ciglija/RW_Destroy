@@ -35,6 +35,7 @@ public class LoginActivity extends AppCompatActivity {
         initializeComponents();
         initializeEvents();
     }
+
     private void initializeComponents() {
         usernameEditText = findViewById(R.id.username_edit_text);
         passwordEditText = findViewById(R.id.password_edit_text);
@@ -42,10 +43,11 @@ public class LoginActivity extends AppCompatActivity {
         prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE);
     }
 
-    private void initializeEvents(){
+    private void initializeEvents() {
         loadUsers();
         loginButton.setOnClickListener(v -> loginUserFun());
     }
+
     private void loadUsers() {
 
         ApiClient.loadUsers(new Callback() {
@@ -83,18 +85,17 @@ public class LoginActivity extends AppCompatActivity {
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()) {
                     try {
-                        prefs.edit().putString("jwt_token",  new JSONObject(response.body().string()).getString("access_token")).apply();
+                        prefs.edit().putString("jwt_token", new JSONObject(response.body().string()).getString("access_token")).apply();
                         runOnUiThread(() -> {
                             startActivity(new Intent(LoginActivity.this, MainActivity.class));
                             finish();
                         });
                     } catch (Exception e) {
                         e.printStackTrace();
-                    }finally {
+                    } finally {
                         response.close();
                     }
-                }
-                else{
+                } else {
                     passwordEditText.setText("");
                     runOnUiThread(() -> {
                         Toast.makeText(LoginActivity.this, "Pogrešni kredencijali!", Toast.LENGTH_SHORT).show();
