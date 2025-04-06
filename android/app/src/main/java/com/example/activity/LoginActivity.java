@@ -42,8 +42,8 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         initializeComponents();
-        initializeEvents();
         setupHttpClient();
+        initializeEvents();
     }
     private void initializeComponents() {
         usernameEditText = findViewById(R.id.username_edit_text);
@@ -71,7 +71,7 @@ public class LoginActivity extends AppCompatActivity {
                 .post(body)
                 .build();
 
-        new OkHttpClient().newCall(request).enqueue(new Callback() {
+        httpClient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Greška u konekciji!", Toast.LENGTH_SHORT).show());
@@ -82,7 +82,7 @@ public class LoginActivity extends AppCompatActivity {
                 if (!response.isSuccessful()) {
                     runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Korisnici nisu učitani molimo vas da restartujete aplikaciju.", Toast.LENGTH_SHORT).show());
                 }
-                //response.close();
+                response.close();
             }
         });
     }

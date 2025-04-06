@@ -50,7 +50,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void initializeEvents(){
         btnLoadDatabase.setOnClickListener(v -> loadDatabase());
-        btnScan.setOnClickListener(v -> startActivity(new Intent(this, ScannerActivity.class)));
+        btnScan.setOnClickListener(v -> {
+            Intent intent = new Intent(this, ScannerActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            startActivity(intent);
+        });
         btnSendReport.setOnClickListener(v -> sendReport());
         btnFinish.setOnClickListener(v -> finish());
     }
