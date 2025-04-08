@@ -1,67 +1,67 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="24dp"
-    android:gravity="center_horizontal"
-    android:background="#003366"> <!-- tamnoplava pozadina -->
+    android:background="#003366">
 
-    <!-- Logo sa belom konturom (ili tvoj logo sa tintom ako je PNG crni) -->
-
-    <!-- Razmak -->
-
-    <ImageView
-        android:id="@+id/logo"
-        android:layout_width="279dp"
-        android:layout_height="257dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="48dp"
-        android:adjustViewBounds="true"
-        android:src="@drawable/rw_logo"
-        android:tint="#FFFFFF"
-        android:tintMode="src_in" />
-
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="32dp" />
-
-    <EditText
-        android:id="@+id/username_edit_text"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/border_white"
-        android:drawableLeft="@drawable/baseline_man_24"
-        android:drawablePadding="10dp"
-        android:hint="Username"
-        android:inputType="textEmailAddress"
-        android:padding="16dp"
-        android:textColorHint="#FFFFFF"
-        android:textColor="#FFFFFF" />
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:gravity="center_horizontal">
 
-    <!-- Password -->
-    <EditText
-        android:id="@+id/password_edit_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Password"
-        android:inputType="textPassword"
-        android:textColorHint="#FFFFFF"
-        android:textColor="#FFFFFF"
-        android:layout_marginTop="16dp"
-        android:background="@drawable/border_white"
-        android:drawableLeft="@drawable/baseline_key_24"
-        android:drawablePadding="10dp"
-        android:padding="16dp" />
+        <ImageView
+            android:id="@+id/logo"
+            android:layout_width="279dp"
+            android:layout_height="257dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="24dp"
+            android:adjustViewBounds="true"
+            android:src="@drawable/rw_logo"
+            android:tint="#FFFFFF"
+            android:tintMode="src_in" />
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btn_login"
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:text="LOGIN"
-        android:textColor="#003366"
-        android:backgroundTint="#FFFFFF"
-        android:textStyle="bold"
-        android:layout_marginTop="24dp" />
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="32dp" />
 
-</LinearLayout>
+        <EditText
+            android:id="@+id/username_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/border_white"
+            android:drawableLeft="@drawable/baseline_man_24"
+            android:drawablePadding="10dp"
+            android:hint="Username"
+            android:inputType="textEmailAddress"
+            android:padding="16dp"
+            android:textColorHint="#FFFFFF"
+            android:textColor="#FFFFFF" />
+
+        <EditText
+            android:id="@+id/password_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Password"
+            android:inputType="textPassword"
+            android:textColorHint="#FFFFFF"
+            android:textColor="#FFFFFF"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/border_white"
+            android:drawableLeft="@drawable/baseline_key_24"
+            android:drawablePadding="10dp"
+            android:padding="16dp" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_login"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="LOGIN"
+            android:textColor="#003366"
+            android:backgroundTint="#FFFFFF"
+            android:textStyle="bold"
+            android:layout_marginTop="24dp" />
+
+    </LinearLayout>
+</ScrollView>
