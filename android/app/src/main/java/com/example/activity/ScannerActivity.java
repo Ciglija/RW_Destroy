@@ -203,10 +203,10 @@ public class ScannerActivity extends AppCompatActivity {
                             int unscannedCount = new JSONObject(finalResponseBody).getInt("unscanned");
 
                             BoxAlertDialog.showUnreadBoxesAlert(ScannerActivity.this,
-                                    unscannedCount,
+                                    "Ostalo je još: " + unscannedCount + " neskeniranih kutija.",
                                     new BoxAlertDialog.AlertResponseListener() {
                                         @Override
-                                        public void onContinueSelected() { }
+                                        public void onContinueSelected() {}
 
                                         @Override
                                         public void onExitSelected() {

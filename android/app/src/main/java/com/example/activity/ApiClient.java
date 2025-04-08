@@ -91,4 +91,7 @@ public class ApiClient {
     public static void getUnscannedCount(Callback callback) {
         client.newCall(buildGetRequest("get-missing-count")).enqueue(callback);
     }
+    public static void getClientName(Callback callback) {
+        client.newCall(buildGetRequest("get-client-name")).enqueue(callback);
+    }
 }

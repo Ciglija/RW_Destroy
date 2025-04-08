@@ -2,10 +2,13 @@ package com.example.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import org.json.JSONObject;
 
 import java.io.IOException;
 
@@ -35,7 +38,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initializeEvents() {
-        btnLoadDatabase.setOnClickListener(v -> loadDatabase());
+        btnLoadDatabase.setOnClickListener(v -> {
+            checkClient(() -> {
+                unscannedCount(() -> {
+                    loadDatabase();
+                });
+            });
+        });
         btnScan.setOnClickListener(v -> {
             Intent intent = new Intent(this, ScannerActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -45,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadDatabase() {
+
         ApiClient.loadDatabase(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -54,6 +64,110 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call call, Response response) {
                 runOnUiThread(() -> Toast.makeText(MainActivity.this, "Uspesno učitana baza!", Toast.LENGTH_SHORT).show());
+                response.close();
+            }
+        });
+    }
+    private void checkClient(Runnable onSuccess) {
+        ApiClient.getClientName(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                runOnUiThread(() -> {
+                    Toast.makeText(MainActivity.this, "Greška sa internetom!", Toast.LENGTH_SHORT).show();
+                });
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String responseBody = null;
+
+                try {
+                    if (response.isSuccessful() && response.body() != null) {
+                        responseBody = response.body().string();
+                    }
+                } catch (Exception e) {
+                    Log.e("API_RESPONSE", "Greska prilikom citanja odgovora", e);
+                }
+
+                String finalResponseBody = responseBody;
+                runOnUiThread(() -> {
+                    try {
+                        if (finalResponseBody != null) {
+                            String clientName = new JSONObject(finalResponseBody).getString("client_name");
+
+                            BoxAlertDialog.showUnreadBoxesAlert(MainActivity.this,
+                                    "Da li se uništava klijent pod nazivom: " + clientName,
+                                    new BoxAlertDialog.AlertResponseListener() {
+
+                                        @Override
+                                        public void onContinueSelected() {
+                                            onSuccess.run();
+                                        }
+
+                                        @Override
+                                        public void onExitSelected() {
+                                        }
+                                    });
+                        } else {
+                            Toast.makeText(MainActivity.this, "Greška u server odgovoru!", Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (Exception e) {
+                        Toast.makeText(MainActivity.this, "Greška u obradi podataka!", Toast.LENGTH_SHORT).show();
+                        Log.e("API_RESPONSE", "Parsiranje nije uspelo", e);
+                    }
+                });
+                response.close();
+            }
+        });
+    }
+
+    private void unscannedCount(Runnable onSuccess) {
+        ApiClient.getUnscannedCount(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                runOnUiThread(() -> {
+                    Toast.makeText(MainActivity.this, "Greška sa internetom!", Toast.LENGTH_SHORT).show();
+                });
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String responseBody = null;
+
+                try {
+                    if (response.isSuccessful() && response.body() != null) {
+                        responseBody = response.body().string();
+                    }
+                } catch (Exception e) {
+                    Log.e("API_RESPONSE", "Greska prilikom citanja odgovora", e);
+                }
+
+                String finalResponseBody = responseBody;
+                runOnUiThread(() -> {
+                    try {
+                        if (finalResponseBody != null) {
+                            int unscannedCount = new JSONObject(finalResponseBody).getInt("unscanned");
+
+                            BoxAlertDialog.showUnreadBoxesAlert(MainActivity.this,
+                                    "Ostalo je još: " + unscannedCount + " neskeniranih kutija.",
+                                    new BoxAlertDialog.AlertResponseListener() {
+                                        @Override
+                                        public void onContinueSelected() {
+                                            onSuccess.run();
+                                        }
+
+                                        @Override
+                                        public void onExitSelected() {
+                                        }
+                                    });
+                        } else {
+                            Toast.makeText(MainActivity.this, "Greška u server odgovoru!", Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (Exception e) {
+                        Toast.makeText(MainActivity.this, "Greška u obradi podataka!", Toast.LENGTH_SHORT).show();
+                        Log.e("API_RESPONSE", "Parsiranje nije uspelo", e);
+                    }
+                });
                 response.close();
             }
         });

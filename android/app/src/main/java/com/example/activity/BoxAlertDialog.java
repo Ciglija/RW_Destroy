@@ -4,17 +4,17 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 
-public class BoxAlertDialog {
+public class BoxAlertDialog<T> {
 
     public interface AlertResponseListener {
         void onContinueSelected();
         void onExitSelected();
     }
 
-    public static void showUnreadBoxesAlert(Context context, int unreadCount, AlertResponseListener listener) {
+    public static  void showUnreadBoxesAlert(Context context, String data, AlertResponseListener listener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Obaveštenje");
-        builder.setMessage("Ostalo je još: " + unreadCount + " neskeniranih kutija,");
+        builder.setMessage(data);
 
         builder.setPositiveButton("Nastavi sa radom", new DialogInterface.OnClickListener() {
             @Override
