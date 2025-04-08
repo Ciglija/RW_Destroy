@@ -22,8 +22,9 @@ public class ScannerViewModel extends ViewModel {
                 newList.add(barcode);
                 scannedBoxesLiveData.postValue(newList);
             }
+            showToast("Uspešno skeniranje ✅");
         } else {
-            showToast("Already scanned.");
+            showToast("Barkod vec skeniran.");
         }
     }
 

@@ -93,8 +93,8 @@ public class ScannerActivity extends AppCompatActivity {
                 if (intent != null && DATAWEDGE_SCANNER_OUTPUT_ACTION.equals(intent.getAction())) {
                     String barcode = intent.getStringExtra(BARCODE_DATA);
                     if (barcode != null && !barcode.isEmpty()) {
-                        viewModel.handleNewBarcode(barcode);
                         sendBarcodeToServer(barcode);
+                        viewModel.handleNewBarcode(barcode);
                     }
                 }
             }
@@ -122,7 +122,6 @@ public class ScannerActivity extends AppCompatActivity {
                     if (!response.isSuccessful()) {
                         runOnUiThread(() -> blockScanner());
                     }
-                    viewModel.showToast("Uspešno skeniranje ✅");
                 } finally {
                     response.close();
                 }
