@@ -11,19 +11,19 @@ public class BoxAlertDialog {
         void onExitSelected();
     }
 
-    public static  void showUnreadBoxesAlert(Context context, String data, AlertResponseListener listener) {
+    public static  void showUnreadBoxesAlert(Context context, String data,String positiveBtnText, String negativeBtnText, AlertResponseListener listener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Obaveštenje");
         builder.setMessage(data);
 
-        builder.setPositiveButton("Nastavi sa radom", (dialog, which) -> {
+        builder.setPositiveButton(positiveBtnText, (dialog, which) -> {
             if (listener != null) {
                 listener.onContinueSelected();
             }
             dialog.dismiss();
         });
 
-        builder.setNegativeButton("Završi", (dialog, which) -> {
+        builder.setNegativeButton(negativeBtnText, (dialog, which) -> {
             if (listener != null) {
                 listener.onExitSelected();
             }

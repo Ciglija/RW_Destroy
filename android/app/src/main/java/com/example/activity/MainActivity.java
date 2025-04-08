@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         ApiClient.loadDatabase(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                runOnUiThread(() -> Toast.makeText(MainActivity.this, "Greska Internet!", Toast.LENGTH_LONG).show());
+                runOnUiThread(() -> Toast.makeText(MainActivity.this, "Greška sa internetom!!", Toast.LENGTH_LONG).show());
             }
 
             @Override
@@ -89,6 +89,8 @@ public class MainActivity extends AppCompatActivity {
 
                             BoxAlertDialog.showUnreadBoxesAlert(MainActivity.this,
                                     "Da li se uništava klijent pod nazivom: " + clientName,
+                                    "Učitaj",
+                                    "Ne učitavaj",
                                     new BoxAlertDialog.AlertResponseListener() {
 
                                         @Override
@@ -105,7 +107,6 @@ public class MainActivity extends AppCompatActivity {
                         }
                     } catch (Exception e) {
                         Toast.makeText(MainActivity.this, "Greška u obradi podataka!", Toast.LENGTH_SHORT).show();
-                        Log.e("API_RESPONSE", "Parsiranje nije uspelo", e);
                     }
                 });
                 response.close();
@@ -140,6 +141,8 @@ public class MainActivity extends AppCompatActivity {
 
                             BoxAlertDialog.showUnreadBoxesAlert(MainActivity.this,
                                     "Ostalo je još: " + unscannedCount + " neskeniranih kutija.",
+                                    "Nastavi",
+                                    "Prekini",
                                     new BoxAlertDialog.AlertResponseListener() {
                                         @Override
                                         public void onContinueSelected() {
@@ -155,7 +158,6 @@ public class MainActivity extends AppCompatActivity {
                         }
                     } catch (Exception e) {
                         Toast.makeText(MainActivity.this, "Greška u obradi podataka!", Toast.LENGTH_SHORT).show();
-                        Log.e("API_RESPONSE", "Parsiranje nije uspelo", e);
                     }
                 });
                 response.close();
@@ -167,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
         ApiClient.generateReport(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                runOnUiThread(() -> Toast.makeText(MainActivity.this, "Greska Internet!", Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(MainActivity.this, "Greška sa internetom!", Toast.LENGTH_SHORT).show());
             }
 
             @Override

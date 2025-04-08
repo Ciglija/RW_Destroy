@@ -52,7 +52,7 @@ public class LoginActivity extends AppCompatActivity {
         ApiClient.loadUsers(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Greška u konekciji!", Toast.LENGTH_LONG).show());
+                runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Greška sa internetom!", Toast.LENGTH_LONG).show());
             }
 
             @Override
@@ -91,7 +91,7 @@ public class LoginActivity extends AppCompatActivity {
                             finish();
                         });
                     } catch (Exception e) {
-                        runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Greška Internet!", Toast.LENGTH_SHORT).show());
+                        runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Greška sa internetom!", Toast.LENGTH_SHORT).show());
 
                     }
                 } else {

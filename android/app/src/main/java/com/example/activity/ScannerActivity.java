@@ -185,6 +185,8 @@ public class ScannerActivity extends AppCompatActivity {
 
                             BoxAlertDialog.showUnreadBoxesAlert(ScannerActivity.this,
                                     "Ostalo je još: " + unscannedCount + " neskeniranih kutija.",
+                                    "Nastavi skeniranje",
+                                    "Završi",
                                     new BoxAlertDialog.AlertResponseListener() {
                                         @Override
                                         public void onContinueSelected() {}
