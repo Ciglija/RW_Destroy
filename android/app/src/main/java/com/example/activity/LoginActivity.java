@@ -3,7 +3,6 @@ package com.example.activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -82,24 +81,22 @@ public class LoginActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(Call call, Response response) {
                 if (response.isSuccessful()) {
-                    try {
+                    try (response) {
+                        assert response.body() != null;
                         prefs.edit().putString("jwt_token", new JSONObject(response.body().string()).getString("access_token")).apply();
                         runOnUiThread(() -> {
                             startActivity(new Intent(LoginActivity.this, MainActivity.class));
                             finish();
                         });
                     } catch (Exception e) {
-                        e.printStackTrace();
-                    } finally {
-                        response.close();
+                        runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Greška Internet!", Toast.LENGTH_SHORT).show());
+
                     }
                 } else {
                     passwordEditText.setText("");
-                    runOnUiThread(() -> {
-                        Toast.makeText(LoginActivity.this, "Pogrešni kredencijali!", Toast.LENGTH_SHORT).show();
-                    });
+                    runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Pogrešni kredencijali!", Toast.LENGTH_SHORT).show());
                     response.close();
                 }
             }

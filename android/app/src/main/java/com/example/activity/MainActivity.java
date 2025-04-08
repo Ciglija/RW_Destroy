@@ -38,19 +38,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initializeEvents() {
-        btnLoadDatabase.setOnClickListener(v -> {
-            checkClient(() -> {
-                unscannedCount(() -> {
-                    loadDatabase();
-                });
-            });
-        });
+        btnLoadDatabase.setOnClickListener(v -> unscannedCount(() -> checkClient(this::loadDatabase)));
         btnScan.setOnClickListener(v -> {
             Intent intent = new Intent(this, ScannerActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(intent);
         });
-        btnSendReport.setOnClickListener(v -> sendReport());
+        btnSendReport.setOnClickListener(v -> unscannedCount(this::sendReport));
     }
 
     private void loadDatabase() {
@@ -72,13 +66,11 @@ public class MainActivity extends AppCompatActivity {
         ApiClient.getClientName(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                runOnUiThread(() -> {
-                    Toast.makeText(MainActivity.this, "Greška sa internetom!", Toast.LENGTH_SHORT).show();
-                });
+                runOnUiThread(() -> Toast.makeText(MainActivity.this, "Greška sa internetom!", Toast.LENGTH_SHORT).show());
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(Call call, Response response) {
                 String responseBody = null;
 
                 try {
@@ -125,13 +117,11 @@ public class MainActivity extends AppCompatActivity {
         ApiClient.getUnscannedCount(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                runOnUiThread(() -> {
-                    Toast.makeText(MainActivity.this, "Greška sa internetom!", Toast.LENGTH_SHORT).show();
-                });
+                runOnUiThread(() -> Toast.makeText(MainActivity.this, "Greška sa internetom!", Toast.LENGTH_SHORT).show());
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(Call call, Response response) {
                 String responseBody = null;
 
                 try {

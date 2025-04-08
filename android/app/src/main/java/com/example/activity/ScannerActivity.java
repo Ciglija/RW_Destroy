@@ -12,17 +12,13 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.Observer;
-
 
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -34,7 +30,6 @@ public class ScannerActivity extends AppCompatActivity {
     private static final String DATAWEDGE_SCANNER_OUTPUT_ACTION = "com.symbol.datawedge.scanner.ACTION";
     private static final String BARCODE_DATA = "com.symbol.datawedge.data_string";
 
-    private ListView listView;
     private Button btnFinish;
     private ArrayAdapter<String> adapter;
     private String token;
@@ -53,7 +48,7 @@ public class ScannerActivity extends AppCompatActivity {
     }
 
     private void initializeComponents() {
-        listView = findViewById(R.id.barcode_list);
+        ListView listView = findViewById(R.id.barcode_list);
         btnFinish = findViewById(R.id.btn_finish);
         token = getSharedPreferences("AppPrefs", MODE_PRIVATE).getString("jwt_token", "");
         viewModel = new ViewModelProvider(this).get(ScannerViewModel.class);
@@ -67,21 +62,15 @@ public class ScannerActivity extends AppCompatActivity {
     }
 
     private void setupObservers() {
-        viewModel.getScannedBoxesLiveData().observe(this, new Observer<List<String>>() {
-            @Override
-            public void onChanged(List<String> barcodes) {
-                adapter.clear();
-                adapter.addAll(barcodes);
-                adapter.notifyDataSetChanged();
-            }
+        viewModel.getScannedBoxesLiveData().observe(this, barcodes -> {
+            adapter.clear();
+            adapter.addAll(barcodes);
+            adapter.notifyDataSetChanged();
         });
 
-        viewModel.getToastMessage().observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(String message) {
-                if (message != null && !message.isEmpty()) {
-                    Toast.makeText(ScannerActivity.this, message, Toast.LENGTH_SHORT).show();
-                }
+        viewModel.getToastMessage().observe(this, message -> {
+            if (message != null && !message.isEmpty()) {
+                Toast.makeText(ScannerActivity.this, message, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -118,12 +107,10 @@ public class ScannerActivity extends AppCompatActivity {
 
             @Override
             public void onResponse(Call call, Response response) {
-                try {
+                try (response) {
                     if (!response.isSuccessful()) {
                         runOnUiThread(() -> blockScanner());
                     }
-                } finally {
-                    response.close();
                 }
             }
         });
@@ -139,9 +126,7 @@ public class ScannerActivity extends AppCompatActivity {
                         runOnUiThread(() ->
                                 Toast.makeText(ScannerActivity.this, "Rad nastavljen ✅", Toast.LENGTH_SHORT).show());
                     } else {
-                        runOnUiThread(() -> {
-                            blockScanner();
-                        });
+                        runOnUiThread(() -> blockScanner());
                     }
                 });
             }
@@ -165,11 +150,9 @@ public class ScannerActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                try {
+            public void onResponse(Call call, Response response) {
+                try (response) {
                     runOnUiThread(() -> callback.onResult(response.isSuccessful()));
-                } finally {
-                    response.close();
                 }
             }
         });
@@ -179,13 +162,11 @@ public class ScannerActivity extends AppCompatActivity {
         ApiClient.getUnscannedCount(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                runOnUiThread(() -> {
-                    Toast.makeText(ScannerActivity.this, "Greška sa internetom!", Toast.LENGTH_SHORT).show();
-                });
+                runOnUiThread(() -> Toast.makeText(ScannerActivity.this, "Greška sa internetom!", Toast.LENGTH_SHORT).show());
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(Call call, Response response) {
                 String responseBody = null;
 
                 try {

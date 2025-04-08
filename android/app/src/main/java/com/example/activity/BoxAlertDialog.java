@@ -4,7 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 
-public class BoxAlertDialog<T> {
+public class BoxAlertDialog {
 
     public interface AlertResponseListener {
         void onContinueSelected();
@@ -16,24 +16,18 @@ public class BoxAlertDialog<T> {
         builder.setTitle("Obaveštenje");
         builder.setMessage(data);
 
-        builder.setPositiveButton("Nastavi sa radom", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (listener != null) {
-                    listener.onContinueSelected();
-                }
-                dialog.dismiss();
+        builder.setPositiveButton("Nastavi sa radom", (dialog, which) -> {
+            if (listener != null) {
+                listener.onContinueSelected();
             }
+            dialog.dismiss();
         });
 
-        builder.setNegativeButton("Završi", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (listener != null) {
-                    listener.onExitSelected();
-                }
-                dialog.dismiss();
+        builder.setNegativeButton("Završi", (dialog, which) -> {
+            if (listener != null) {
+                listener.onExitSelected();
             }
+            dialog.dismiss();
         });
 
         builder.setCancelable(false);
