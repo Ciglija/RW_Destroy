@@ -119,11 +119,10 @@ public class ScannerActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call call, Response response) {
                 try {
-                    if (response.isSuccessful()) {
-                        viewModel.showToast("Uspešno skeniranje!");
-                    } else {
+                    if (!response.isSuccessful()) {
                         runOnUiThread(() -> blockScanner());
                     }
+                    viewModel.showToast("Uspešno skeniranje ✅");
                 } finally {
                     response.close();
                 }
@@ -202,7 +201,6 @@ public class ScannerActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     try {
                         if (finalResponseBody != null) {
-                            Log.d("API_RESPONSE", "Body: " + finalResponseBody);
                             int unscannedCount = new JSONObject(finalResponseBody).getInt("unscanned");
 
                             BoxAlertDialog.showUnreadBoxesAlert(ScannerActivity.this,

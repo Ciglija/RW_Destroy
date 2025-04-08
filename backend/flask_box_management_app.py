@@ -3,6 +3,7 @@ from flask_jwt_extended import (
     JWTManager, create_access_token,
     jwt_required, get_jwt_identity
 )
+from flask_mail import Mail, Message
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import create_engine, text
 import pandas as pd
@@ -14,6 +15,16 @@ app = Flask(__name__)
 app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
 jwt = JWTManager(app)
+
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = os.getenv("EMAIL")
+app.config['MAIL_PASSWORD'] = os.getenv("PASSWORD")
+app.config['MAIL_DEFAULT_SENDER'] = ('RW_Skeniranje', os.getenv("EMAIL"))
+
+mail = Mail(app)
+
 
 os.makedirs('backend/database', exist_ok=True)
 engine = create_engine('sqlite:///backend/database/RWdestroydb.db')
@@ -191,7 +202,10 @@ def generate_report():
 
         all_boxes[['client', 'box', 'batch', 'scanned_by', 'scan_time', 'present']] \
             .to_excel(REPORT_FILE_PATH, index=False)
-
+        msg = Message('Report poslat',
+                      recipients=['kasicilija12@email.com'])
+        msg.body = 'Zavrseno skeniranje, report poslat.'
+        mail.send(msg)
         return jsonify({
             "message": f"Report generated at {REPORT_FILE_PATH}",
             "report_path": REPORT_FILE_PATH
