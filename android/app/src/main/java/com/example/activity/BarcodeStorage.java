@@ -12,4 +12,7 @@ public class BarcodeStorage {
     public static List<String> getBarcodes() {
         return new ArrayList<>(scannedBarcodes);
     }
+    public static void clear(){
+        scannedBarcodes.clear();
+    }
 }

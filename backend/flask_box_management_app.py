@@ -193,10 +193,9 @@ def get_missing_count():
 @app.route('/get-client-name', methods=['GET'])
 def get_client_name():
     try:
-        with engine.connect() as connection:
-            result = connection.execute(text("SELECT client FROM boxes LIMIT 1"))
-            client = result.scalar()
-            return jsonify({"client_name": client}), 200
+        df = pd.read_excel(BOX_DB_FILE_PATH, nrows=1)
+        client = df.at[0, "Klijent"]
+        return jsonify({"client_name": client}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
