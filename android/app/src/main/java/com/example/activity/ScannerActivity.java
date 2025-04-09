@@ -132,25 +132,13 @@ public class ScannerActivity extends AppCompatActivity {
     }
 
     private void blockScanner() {
-        AlertDialogHelper.showAdminAuthDialog(ScannerActivity.this, new AlertDialogHelper.AdminAuthCallback() {
-            @Override
-            public void onCredentialsEntered(String username, String password) {
-                checkAdminCredentials(username, password, isCorrect -> {
-                    if (isCorrect) {
-                        runOnUiThread(() ->
-                                Toast.makeText(ScannerActivity.this, "Rad nastavljen ✅", Toast.LENGTH_SHORT).show());
-                    } else {
-                        runOnUiThread(() -> blockScanner());
-                    }
-                });
+        AlertDialogHelper.showAdminAuthDialog(ScannerActivity.this, (username, password) -> checkAdminCredentials(username, password, isCorrect -> {
+            if (isCorrect) {
+                runOnUiThread(() ->Toast.makeText(ScannerActivity.this, "Rad nastavljen ✅", Toast.LENGTH_SHORT).show());
+            } else {
+                runOnUiThread(() -> blockScanner());
             }
-
-            @Override
-            public void onDialogCanceled() {
-                runOnUiThread(() ->
-                        Toast.makeText(ScannerActivity.this, "Potrebna je administratorska dozvola", Toast.LENGTH_SHORT).show());
-            }
-        });
+        }));
     }
 
     private void checkAdminCredentials(String username, String password, PasswordCheckCallback callback) {
@@ -180,7 +168,7 @@ public class ScannerActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(Call call, Response response) {
                 try {
                     String body = response.body().string();
                     JSONObject json = new JSONObject(body);

@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -38,15 +39,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initializeEvents() {
-        btnLoadDatabase.setOnClickListener(v -> unscannedCount(() -> checkClient(this::loadDatabase,"Učitaj", "Odustani"), "Da li ste sigurni da želite da učitate novu bazu?\n",
-                "Da", "Ne"));
+        btnLoadDatabase.setOnClickListener(v -> getUnscannedCount(() -> checkClient(this::loadDatabase), "Nije moguće učitati novu bazu.\n"));
         btnScan.setOnClickListener(v -> {
             Intent intent = new Intent(this, ScannerActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(intent);
         });
-        btnSendReport.setOnClickListener(v -> unscannedCount(this::sendReport, "Da li ste sigurni da želite da kreirate novi izveštaj?\n",
-                "Kreiraj", "Odustani"));
+        btnSendReport.setOnClickListener(v -> getUnscannedCount(this::sendReport, "Nije moguće kreirati izveštaj.\n"));
     }
 
     private void loadDatabase() {
@@ -65,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-    private void checkClient(Runnable onSuccess, String proceedStr, String exitStr) {
+    private void checkClient(Runnable onSuccess) {
         ApiClient.getClientName(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -74,50 +73,26 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onResponse(Call call, Response response) {
-                String responseBody = null;
-
-                try {
-                    if (response.isSuccessful() && response.body() != null) {
-                        responseBody = response.body().string();
-                    }
-                } catch (Exception e) {
-                    Log.e("API_RESPONSE", "Greska prilikom citanja odgovora", e);
+                try (response) {
+                    assert response.body() != null;
+                    String body = response.body().string();
+                    JSONObject json = new JSONObject(body);
+                    String clientName = json.getString("client_name");
+                    runOnUiThread(()->{
+                    BoxAlertDialog.showUnreadBoxesAlert(MainActivity.this,
+                            "Da li se uništava klijent pod nazivom: " + clientName + "?",
+                            true,
+                            onSuccess::run);
+                    });
+                } catch (JSONException | IOException e) {
+                    runOnUiThread(() -> Toast.makeText(MainActivity.this, "Greška u odgovoru!", Toast.LENGTH_SHORT).show());
                 }
 
-                String finalResponseBody = responseBody;
-                runOnUiThread(() -> {
-                    try {
-                        if (finalResponseBody != null) {
-                            String clientName = new JSONObject(finalResponseBody).getString("client_name");
-
-                            BoxAlertDialog.showUnreadBoxesAlert(MainActivity.this,
-                                    "Da li se uništava klijent pod nazivom: " + clientName + "?",
-                                    proceedStr,
-                                    exitStr,
-                                    new BoxAlertDialog.AlertResponseListener() {
-
-                                        @Override
-                                        public void onContinueSelected() {
-                                            onSuccess.run();
-                                        }
-
-                                        @Override
-                                        public void onExitSelected() {
-                                        }
-                                    });
-                        } else {
-                            Toast.makeText(MainActivity.this, "Greška u server odgovoru!", Toast.LENGTH_SHORT).show();
-                        }
-                    } catch (Exception e) {
-                        Toast.makeText(MainActivity.this, "Greška u obradi podataka!", Toast.LENGTH_SHORT).show();
-                    }
-                });
-                response.close();
             }
         });
     }
 
-    private void unscannedCount(Runnable onSuccess, String msgStr, String proceedStr, String exitStr) {
+    private void getUnscannedCount(Runnable onSuccess, String msgStr) {
         ApiClient.getUnscannedCount(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -126,44 +101,26 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onResponse(Call call, Response response) {
-                String responseBody = null;
 
-                try {
-                    if (response.isSuccessful() && response.body() != null) {
-                        responseBody = response.body().string();
-                    }
-                } catch (Exception e) {
-                    Log.e("API_RESPONSE", "Greska prilikom citanja odgovora", e);
+                try (response) {
+                    assert response.body() != null;
+                    String body = response.body().string();
+                    JSONObject json = new JSONObject(body);
+                    int unscannedCount = json.getInt("unscanned");
+                    runOnUiThread(()->{
+                        if (unscannedCount > 0) {
+                            BoxAlertDialog.showUnreadBoxesAlert(MainActivity.this,
+                                    msgStr + "Imate još: " + unscannedCount + "  kutija iz prethodne baze.",
+                                    false,
+                                    () -> {});
+                        } else {
+                            onSuccess.run();
+                        }
+                    });
+                } catch (JSONException | IOException e) {
+                    runOnUiThread(() -> Toast.makeText(MainActivity.this, "Greška u odgovoru!", Toast.LENGTH_SHORT).show());
                 }
 
-                String finalResponseBody = responseBody;
-                runOnUiThread(() -> {
-                    try {
-                        if (finalResponseBody != null) {
-                            int unscannedCount = new JSONObject(finalResponseBody).getInt("unscanned");
-
-                            BoxAlertDialog.showUnreadBoxesAlert(MainActivity.this,
-                                    msgStr + (unscannedCount > 0 ? "Imate još: " + unscannedCount + "  kutija iz prethodne baze.": "Sve kutije su skenirane."),
-                                    proceedStr,
-                                    exitStr,
-                                    new BoxAlertDialog.AlertResponseListener() {
-                                        @Override
-                                        public void onContinueSelected() {
-                                            onSuccess.run();
-                                        }
-
-                                        @Override
-                                        public void onExitSelected() {
-                                        }
-                                    });
-                        } else {
-                            Toast.makeText(MainActivity.this, "Greška u server odgovoru!", Toast.LENGTH_SHORT).show();
-                        }
-                    } catch (Exception e) {
-                        Toast.makeText(MainActivity.this, "Greška u obradi podataka!", Toast.LENGTH_SHORT).show();
-                    }
-                });
-                response.close();
             }
         });
     }

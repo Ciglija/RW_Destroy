@@ -12,7 +12,6 @@ public class AlertDialogHelper {
 
     public interface AdminAuthCallback {
         void onCredentialsEntered(String username, String password);
-        void onDialogCanceled();
     }
 
     public static void showAdminAuthDialog(Context context, AdminAuthCallback callback) {
