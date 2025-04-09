@@ -2,9 +2,9 @@ package com.example.activity;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -16,34 +16,38 @@ public class AlertDialogHelper {
 
     public static void showAdminAuthDialog(Context context, AdminAuthCallback callback) {
         try {
-            if (context == null) {
-                return;
-            }
+            if (context == null) return;
 
             LayoutInflater inflater = LayoutInflater.from(context);
             View dialogView = inflater.inflate(R.layout.dialog_admin_auth, null);
 
             EditText etUsername = dialogView.findViewById(R.id.etUsername);
             EditText etPassword = dialogView.findViewById(R.id.etPassword);
+            Button btnConfirm = dialogView.findViewById(R.id.btnConfirm);
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(context)
+            AlertDialog dialog = new AlertDialog.Builder(context)
                     .setView(dialogView)
                     .setCancelable(false)
-                    .setPositiveButton("Potvrdi", (dialog, which) -> {
-                        String adminUsername = etUsername.getText().toString().trim();
-                        String adminPassword = etPassword.getText().toString().trim();
+                    .create();
 
-                        if (adminUsername.isEmpty() || adminPassword.isEmpty()) {
-                            Toast.makeText(context, "Unesite oba podatka!", Toast.LENGTH_SHORT).show();
-                            showAdminAuthDialog(context, callback);
-                        } else {
-                            callback.onCredentialsEntered(adminUsername, adminPassword);
-                        }
-                    });
+            if (dialog.getWindow() != null) {
+                dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+            }
 
-            AlertDialog dialog = builder.create();
+            btnConfirm.setOnClickListener(v -> {
+                String adminUsername = etUsername.getText().toString().trim();
+                String adminPassword = etPassword.getText().toString().trim();
+
+                if (adminUsername.isEmpty() || adminPassword.isEmpty()) {
+                    Toast.makeText(context, "Unesite oba podatka!", Toast.LENGTH_SHORT).show();
+                } else {
+                    dialog.dismiss();
+                    callback.onCredentialsEntered(adminUsername, adminPassword);
+                }
+            });
+
+            dialog.setOnShowListener(d -> etUsername.requestFocus());
             dialog.setCanceledOnTouchOutside(false);
-            dialog.setOnShowListener(dialogInterface -> etUsername.requestFocus());
             dialog.show();
 
         } catch (Exception e) {
