@@ -38,14 +38,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initializeEvents() {
-        btnLoadDatabase.setOnClickListener(v -> unscannedCount(() -> checkClient(this::loadDatabase,"Učitaj", "Odustani"), "Da li ste sigurni da želite da učitate novu bazu\n",
+        btnLoadDatabase.setOnClickListener(v -> unscannedCount(() -> checkClient(this::loadDatabase,"Učitaj", "Odustani"), "Da li ste sigurni da želite da učitate novu bazu?\n",
                 "Da", "Ne"));
         btnScan.setOnClickListener(v -> {
             Intent intent = new Intent(this, ScannerActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(intent);
         });
-        btnSendReport.setOnClickListener(v -> unscannedCount(this::sendReport, "Da li ste sigurni da želite da kreirate novi izveštaj\n",
+        btnSendReport.setOnClickListener(v -> unscannedCount(this::sendReport, "Da li ste sigurni da želite da kreirate novi izveštaj?\n",
                 "Kreiraj", "Odustani"));
     }
 
@@ -143,8 +143,7 @@ public class MainActivity extends AppCompatActivity {
                             int unscannedCount = new JSONObject(finalResponseBody).getInt("unscanned");
 
                             BoxAlertDialog.showUnreadBoxesAlert(MainActivity.this,
-                                    msgStr+
-                                            "Imate još: " + unscannedCount + "  kutija iz prethodne baze.",
+                                    msgStr + (unscannedCount > 0 ? "Imate još: " + unscannedCount + "  kutija iz prethodne baze.": "Sve kutije su skenirane."),
                                     proceedStr,
                                     exitStr,
                                     new BoxAlertDialog.AlertResponseListener() {

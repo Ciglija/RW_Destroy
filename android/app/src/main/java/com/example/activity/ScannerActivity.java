@@ -184,7 +184,7 @@ public class ScannerActivity extends AppCompatActivity {
                             int unscannedCount = new JSONObject(finalResponseBody).getInt("unscanned");
 
                             BoxAlertDialog.showUnreadBoxesAlert(ScannerActivity.this,
-                                    "Ostalo je još: " + unscannedCount + " neskeniranih kutija.",
+                                    unscannedCount > 0 ? "Imate još: " + unscannedCount + "  kutija iz prethodne baze.": "Sve kutije su skenirane.",
                                     "Nastavi skeniranje",
                                     "Završi",
                                     new BoxAlertDialog.AlertResponseListener() {

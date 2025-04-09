@@ -32,7 +32,7 @@ engine = create_engine('sqlite:///backend/database/RWdestroydb.db')
 USER_FILE_PATH = 'backend/excel_files/users.xlsx'
 BOX_DB_FILE_PATH = 'backend/excel_files/boxes.xlsx'
 REPORT_FILE_PATH = 'backend/reports/scanned_boxes_report.xlsx'
-os.makedirs('reports', exist_ok=True)
+os.makedirs('backend/reports', exist_ok=True)
 
 
 @app.route('/login', methods=['POST'])
@@ -205,8 +205,16 @@ def generate_report():
         boxes_query = text("SELECT * FROM boxes")
         all_boxes = pd.read_sql(boxes_query, con=engine)
         print(all_boxes)
-
-        all_boxes[['client', 'box', 'batch', 'scanned_by', 'scan_time', 'present']] \
+        all_boxes["present"] = all_boxes["present"].apply(lambda x: "True" if x  else "False")
+        all_boxes = all_boxes.rename(columns={
+            'client': 'Klijent',
+            'box': 'Kutija',
+            'batch': 'Tura',
+            'scanned_by': 'Skenirao',
+            'scan_time': 'Vreme skeniranja',
+            'present': 'Nalazila se u bazi'
+        })
+        all_boxes[['Klijent', 'Kutija', 'Tura', 'Skenirao', 'Vreme skeniranja', 'Nalazila se u bazi']] \
             .to_excel(REPORT_FILE_PATH, index=False)
         msg = Message('Report poslat',
                       recipients=['kasicilija12@email.com'])
