@@ -21,19 +21,20 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_below="@id/scanned_barcode_text_view"
-        android:layout_above="@id/btn_finish"
+        android:layout_above="@id/unscanned_count_label"
         android:divider="@android:color/darker_gray"
         android:dividerHeight="1dp"/>
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btn_finish"
-        android:text="Završi"
+    <TextView
+        android:id="@+id/unscanned_count_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/button_background"
-        android:textColor="#FFFFFF"
+        android:text="Broj neočitanih kutija: "
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:gravity="center"
         android:padding="12dp"
-        android:layout_marginBottom="12dp"
-        android:layout_alignParentBottom="true" />
+        android:layout_alignParentBottom="true"
+        android:background="#f0f0f0"/>
 
 </RelativeLayout>

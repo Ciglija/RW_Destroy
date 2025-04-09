@@ -11,6 +11,8 @@ public class ScannerViewModel extends ViewModel {
     private final MutableLiveData<List<String>> scannedBoxesLiveData = new MutableLiveData<>(new ArrayList<>());
     private final MutableLiveData<String> toastMessage = new MutableLiveData<>();
 
+    private final MutableLiveData<Integer> cntUnscanned = new MutableLiveData<>(0);
+
     public void handleNewBarcode(String barcode) {
         if (BarcodeStorage.addBarcode(barcode)) {
             List<String> current = scannedBoxesLiveData.getValue();
@@ -35,6 +37,7 @@ public class ScannerViewModel extends ViewModel {
     public LiveData<String> getToastMessage() {
         return toastMessage;
     }
+    public MutableLiveData<Integer> getCntUnscanned() { return cntUnscanned; }
 
     public void showToast(String message) {
         toastMessage.postValue(message);
@@ -43,4 +46,12 @@ public class ScannerViewModel extends ViewModel {
     public void updateBarcodesFromStorage() {
         scannedBoxesLiveData.postValue(BarcodeStorage.getBarcodes());
     }
+
+    public void setCntUnscanned(int val) {
+        cntUnscanned.postValue(val);
+    }
+    public void updateCnt(){
+        cntUnscanned.postValue(cntUnscanned.getValue()-1);
+    }
+
 }

@@ -69,7 +69,7 @@ def import_users():
         df.to_sql('users', con=engine, if_exists='replace', index=False)
         return jsonify({"message": "Users imported successfully with hashed passwords"}), 200
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": "Internal server error"}), 500
 
 
 @app.route('/load-database', methods=['POST'])
@@ -90,7 +90,7 @@ def load_database():
         df.to_sql('boxes', con=engine, if_exists='replace', index=False)
         return jsonify({"message": "Box database loaded successfully"}), 200
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": "Internal server error"}), 500
 
 
 @app.route('/scan-box', methods=['POST'])
@@ -114,7 +114,12 @@ def scan_box():
             con=engine,
             params={'box': box_code}
         )
-        if not box.empty :
+        if not box.empty and box.at[0, "status"]:
+            return jsonify({
+                "message": "Box already scanned",
+                "already_scanned": True
+            }), 200
+        elif not box.empty and not box.at[0, "status"]:
             query = """
                 UPDATE boxes 
                 SET status = TRUE, 
@@ -128,18 +133,17 @@ def scan_box():
                 VALUES (:box_code, TRUE, :scanned_by, :scan_time, FALSE)
             """
 
-
-
         with engine.begin() as connection:
             connection.execute(text(query), params)
 
         if not box.empty:
             return jsonify({
-            "message": "Box scanned successfully"
+                "message": "Box scanned successfully",
+                "already_scanned": False
             }), 200
         else:
             return jsonify({
-            "message": "Box was not present in the database"
+                "message": "Box was not present in the database"
             }), 400
 
     except Exception as e:
@@ -178,7 +182,7 @@ def admin_auth():
             return jsonify({"error": "Invalid admin password"}), 403
 
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": "Internal server error"}), 500
 
 @app.route('/get-missing-count', methods=['GET'])
 def get_missing_count():
@@ -188,7 +192,7 @@ def get_missing_count():
             count = result.scalar()
             return jsonify({"unscanned": count}), 200
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": "Internal server error"}), 500
 
 @app.route('/get-client-name', methods=['GET'])
 def get_client_name():
@@ -225,7 +229,7 @@ def generate_report():
             "report_path": REPORT_FILE_PATH
         }), 200
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": "Internal server error"}), 500
 
 
 @app.route('/')

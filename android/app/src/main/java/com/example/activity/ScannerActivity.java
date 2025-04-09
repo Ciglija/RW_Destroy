@@ -8,13 +8,14 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -30,7 +31,7 @@ public class ScannerActivity extends AppCompatActivity {
     private static final String DATAWEDGE_SCANNER_OUTPUT_ACTION = "com.symbol.datawedge.scanner.ACTION";
     private static final String BARCODE_DATA = "com.symbol.datawedge.data_string";
 
-    private Button btnFinish;
+    private TextView textView;
     private ArrayAdapter<String> adapter;
     private String token;
     private BroadcastReceiver barcodeReceiver;
@@ -42,14 +43,14 @@ public class ScannerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_scanner);
 
         initializeComponents();
-        initializeEvents();
+        getUnscannedCount();
         setupBarcodeReceiver();
         setupObservers();
     }
 
     private void initializeComponents() {
         ListView listView = findViewById(R.id.barcode_list);
-        btnFinish = findViewById(R.id.btn_finish);
+        textView = findViewById(R.id.unscanned_count_label);
         token = getSharedPreferences("AppPrefs", MODE_PRIVATE).getString("jwt_token", "");
         viewModel = new ViewModelProvider(this).get(ScannerViewModel.class);
         viewModel.updateBarcodesFromStorage();
@@ -57,15 +58,18 @@ public class ScannerActivity extends AppCompatActivity {
         listView.setAdapter(adapter);
     }
 
-    private void initializeEvents() {
-        btnFinish.setOnClickListener(v -> finishScanning());
-    }
-
     private void setupObservers() {
         viewModel.getScannedBoxesLiveData().observe(this, barcodes -> {
             adapter.clear();
             adapter.addAll(barcodes);
             adapter.notifyDataSetChanged();
+        });
+
+        viewModel.getCntUnscanned().observe(this, count ->{
+            if(count > 0)
+                textView.setText("Broj neočitanih kutija: " + count);
+            else
+                textView.setText("Završeno!");
         });
 
         viewModel.getToastMessage().observe(this, message -> {
@@ -111,6 +115,16 @@ public class ScannerActivity extends AppCompatActivity {
                     if (!response.isSuccessful()) {
                         runOnUiThread(() -> blockScanner());
                     }
+                    else{
+                        String body = response.body().string();
+                        JSONObject json = new JSONObject(body);
+                        boolean alreadyScanned = json.optBoolean("already_scanned", false);
+                        if (!alreadyScanned) {
+                            viewModel.updateCnt();
+                        }
+                    }
+                } catch (JSONException | IOException e) {
+                    throw new RuntimeException(e);
                 }
             }
         });
@@ -158,7 +172,7 @@ public class ScannerActivity extends AppCompatActivity {
         });
     }
 
-    private void finishScanning() {
+    private void getUnscannedCount() {
         ApiClient.getUnscannedCount(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -166,44 +180,17 @@ public class ScannerActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onResponse(Call call, Response response) {
-                String responseBody = null;
-
+            public void onResponse(Call call, Response response) throws IOException {
                 try {
-                    if (response.isSuccessful() && response.body() != null) {
-                        responseBody = response.body().string();
-                    }
+                    String body = response.body().string();
+                    JSONObject json = new JSONObject(body);
+                    int unscannedCount = json.getInt("unscanned");
+                    runOnUiThread(() -> {
+                        viewModel.setCntUnscanned(unscannedCount);
+                    });
                 } catch (Exception e) {
-                    Log.e("API_RESPONSE", "Greska prilikom citanja odgovora", e);
+                    Toast.makeText(ScannerActivity.this, "Greška u obradi podataka!", Toast.LENGTH_SHORT).show();
                 }
-
-                String finalResponseBody = responseBody;
-                runOnUiThread(() -> {
-                    try {
-                        if (finalResponseBody != null) {
-                            int unscannedCount = new JSONObject(finalResponseBody).getInt("unscanned");
-
-                            BoxAlertDialog.showUnreadBoxesAlert(ScannerActivity.this,
-                                    unscannedCount > 0 ? "Imate još: " + unscannedCount + "  kutija iz prethodne baze.": "Sve kutije su skenirane.",
-                                    "Nastavi skeniranje",
-                                    "Završi",
-                                    new BoxAlertDialog.AlertResponseListener() {
-                                        @Override
-                                        public void onContinueSelected() {}
-
-                                        @Override
-                                        public void onExitSelected() {
-                                            finish();
-                                        }
-                                    });
-                        } else {
-                            Toast.makeText(ScannerActivity.this, "Greška u server odgovoru!", Toast.LENGTH_SHORT).show();
-                        }
-                    } catch (Exception e) {
-                        Toast.makeText(ScannerActivity.this, "Greška u obradi podataka!", Toast.LENGTH_SHORT).show();
-                        Log.e("API_RESPONSE", "Parsiranje nije uspelo", e);
-                    }
-                });
             }
 
         });
