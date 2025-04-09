@@ -38,13 +38,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initializeEvents() {
-        btnLoadDatabase.setOnClickListener(v -> unscannedCount(() -> checkClient(this::loadDatabase)));
+        btnLoadDatabase.setOnClickListener(v -> unscannedCount(() -> checkClient(this::loadDatabase,"Učitaj", "Odustani"), "Da li ste sigurni da želite da učitate novu bazu\n",
+                "Da", "Ne"));
         btnScan.setOnClickListener(v -> {
             Intent intent = new Intent(this, ScannerActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(intent);
         });
-        btnSendReport.setOnClickListener(v -> unscannedCount(this::sendReport));
+        btnSendReport.setOnClickListener(v -> unscannedCount(this::sendReport, "Da li ste sigurni da želite da kreirate novi izveštaj\n",
+                "Kreiraj", "Odustani"));
     }
 
     private void loadDatabase() {
@@ -63,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-    private void checkClient(Runnable onSuccess) {
+    private void checkClient(Runnable onSuccess, String proceedStr, String exitStr) {
         ApiClient.getClientName(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -89,9 +91,9 @@ public class MainActivity extends AppCompatActivity {
                             String clientName = new JSONObject(finalResponseBody).getString("client_name");
 
                             BoxAlertDialog.showUnreadBoxesAlert(MainActivity.this,
-                                    "Da li se uništava klijent pod nazivom: " + clientName,
-                                    "Učitaj",
-                                    "Ne učitavaj",
+                                    "Da li se uništava klijent pod nazivom: " + clientName + "?",
+                                    proceedStr,
+                                    exitStr,
                                     new BoxAlertDialog.AlertResponseListener() {
 
                                         @Override
@@ -115,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void unscannedCount(Runnable onSuccess) {
+    private void unscannedCount(Runnable onSuccess, String msgStr, String proceedStr, String exitStr) {
         ApiClient.getUnscannedCount(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -141,9 +143,10 @@ public class MainActivity extends AppCompatActivity {
                             int unscannedCount = new JSONObject(finalResponseBody).getInt("unscanned");
 
                             BoxAlertDialog.showUnreadBoxesAlert(MainActivity.this,
-                                    "Ostalo je još: " + unscannedCount + " neskeniranih kutija.",
-                                    "Nastavi",
-                                    "Prekini",
+                                    msgStr+
+                                            "Imate još: " + unscannedCount + "  kutija iz prethodne baze.",
+                                    proceedStr,
+                                    exitStr,
                                     new BoxAlertDialog.AlertResponseListener() {
                                         @Override
                                         public void onContinueSelected() {

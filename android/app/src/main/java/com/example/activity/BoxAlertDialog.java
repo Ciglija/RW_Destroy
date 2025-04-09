@@ -13,7 +13,7 @@ public class BoxAlertDialog {
 
     public static  void showUnreadBoxesAlert(Context context, String data,String positiveBtnText, String negativeBtnText, AlertResponseListener listener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Obaveštenje");
+        builder.setTitle("Upozorenje!");
         builder.setMessage(data);
 
         builder.setPositiveButton(positiveBtnText, (dialog, which) -> {

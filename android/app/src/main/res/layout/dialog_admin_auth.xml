@@ -8,7 +8,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Aplikacija blokirana!"
+        android:text="Aplikacija blokirana!\nOčitani barkod nije u bazi!"
         android:textSize="18sp"
         android:textStyle="bold"
         android:textColor="@android:color/black"
@@ -33,7 +33,7 @@
         android:id="@+id/etUsername"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Unesite korisničko ime"
+        android:hint="Unesite admin ime"
         android:inputType="text"
         android:layout_marginBottom="16dp"/>
 
@@ -48,7 +48,7 @@
         android:id="@+id/etPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Unesite šifru"
+        android:hint="Unesite admin šifru"
         android:inputType="textPassword"/>
 
 </LinearLayout>

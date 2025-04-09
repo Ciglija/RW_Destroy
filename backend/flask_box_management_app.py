@@ -205,9 +205,6 @@ def generate_report():
         boxes_query = text("SELECT * FROM boxes")
         all_boxes = pd.read_sql(boxes_query, con=engine)
         print(all_boxes)
-        all_boxes['present'] = all_boxes['status'].apply(
-            lambda x: 'True' if x else 'False'
-        )
 
         all_boxes[['client', 'box', 'batch', 'scanned_by', 'scan_time', 'present']] \
             .to_excel(REPORT_FILE_PATH, index=False)
