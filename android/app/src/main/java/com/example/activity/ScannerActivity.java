@@ -15,6 +15,9 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,10 +36,13 @@ public class ScannerActivity extends AppCompatActivity {
     private static final String BARCODE_DATA = "com.symbol.datawedge.data_string";
 
     private TextView textView;
-    private ArrayAdapter<String> adapter;
+    private BarcodeAdapter adapter;
     private String token;
     private BroadcastReceiver barcodeReceiver;
     private ScannerViewModel viewModel;
+
+    private RecyclerView recyclerView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,21 +56,22 @@ public class ScannerActivity extends AppCompatActivity {
     }
 
     private void initializeComponents() {
-        ListView listView = findViewById(R.id.barcode_list);
+        recyclerView = findViewById(R.id.barcode_list);
         textView = findViewById(R.id.unscanned_count_label);
         token = getSharedPreferences("AppPrefs", MODE_PRIVATE).getString("jwt_token", "");
         viewModel = new ViewModelProvider(this).get(ScannerViewModel.class);
         viewModel.updateBarcodesFromStorage();
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, new ArrayList<>());
-        listView.setAdapter(adapter);
-    }
 
+        adapter = new BarcodeAdapter();
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(adapter);
+
+        recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+    }
     @SuppressLint("StringFormatInvalid")
     private void setupObservers() {
         viewModel.getScannedBoxesLiveData().observe(this, barcodes -> {
-            adapter.clear();
-            adapter.addAll(barcodes);
-            adapter.notifyDataSetChanged();
+            adapter.updateBarcodes(barcodes);
         });
 
         viewModel.getCntUnscanned().observe(this, count ->{
@@ -125,7 +132,6 @@ public class ScannerActivity extends AppCompatActivity {
                                 viewModel.updateCnt();
                                 viewModel.handleNewBarcode(barcode);
                             });
-
                         }else{
                             runOnUiThread(()-> Toast.makeText(ScannerActivity.this, R.string.already_scanned_text, Toast.LENGTH_SHORT).show());
                         }

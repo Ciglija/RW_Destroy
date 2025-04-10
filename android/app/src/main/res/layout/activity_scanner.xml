@@ -16,14 +16,12 @@
         android:textStyle="bold"
         android:paddingBottom="8dp"/>
 
-    <ListView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/barcode_list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_below="@id/scanned_barcode_text_view"
-        android:layout_above="@id/unscanned_count_label"
-        android:divider="@android:color/darker_gray"
-        android:dividerHeight="1dp"/>
+        android:layout_above="@id/unscanned_count_label"/>
 
     <TextView
         android:id="@+id/unscanned_count_label"
