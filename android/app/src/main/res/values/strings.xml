@@ -80,7 +80,9 @@
         libero vel nunc consequat, quis tincidunt nisl eleifend. Cras bibendum enim a justo luctus
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
-
+    <string name="finished_scanning_text1">SKENIRANJE JE KOMPLETIRANO</string>
+    <string name="finished_scanning_text2">SVE KUTIJE IZ BAZE SU SKENIRANE.</string>
+    <string name="write_report_text">Napravi izveštaj</string>
 
 
 </resources>

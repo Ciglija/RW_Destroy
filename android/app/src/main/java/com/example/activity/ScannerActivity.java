@@ -8,8 +8,6 @@ import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,7 +21,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -41,8 +38,6 @@ public class ScannerActivity extends AppCompatActivity {
     private BroadcastReceiver barcodeReceiver;
     private ScannerViewModel viewModel;
 
-    private RecyclerView recyclerView;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +51,7 @@ public class ScannerActivity extends AppCompatActivity {
     }
 
     private void initializeComponents() {
-        recyclerView = findViewById(R.id.barcode_list);
+        RecyclerView recyclerView = findViewById(R.id.barcode_list);
         textView = findViewById(R.id.unscanned_count_label);
         token = getSharedPreferences("AppPrefs", MODE_PRIVATE).getString("jwt_token", "");
         viewModel = new ViewModelProvider(this).get(ScannerViewModel.class);
@@ -70,17 +65,22 @@ public class ScannerActivity extends AppCompatActivity {
     }
     @SuppressLint("StringFormatInvalid")
     private void setupObservers() {
-        viewModel.getScannedBoxesLiveData().observe(this, barcodes -> {
-            adapter.updateBarcodes(barcodes);
-        });
+        viewModel.getScannedBoxesLiveData().observe(this, barcodes -> adapter.updateBarcodes(barcodes));
 
         viewModel.getCntUnscanned().observe(this, count ->{
             if(count > 0)
                 textView.setText(getString(R.string.unscanned_count_text, count));
-            else
+            else{
                 textView.setText(R.string.finished_scanning);
+                SuccessDialog.showSuccessDialog(this, () -> {
+                    generateReport();
+                    Intent intent = new Intent(this, MainActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                    startActivity(intent);
+                    finish();
+                });
+            }
         });
-
     }
 
     private void setupBarcodeReceiver() {
@@ -109,17 +109,15 @@ public class ScannerActivity extends AppCompatActivity {
         ApiClient.sendBarcode(token, barcode, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Toast.makeText(ScannerActivity.this, R.string.internet_error, Toast.LENGTH_SHORT).show();
+                runOnUiThread(()->Toast.makeText(ScannerActivity.this, R.string.internet_error, Toast.LENGTH_SHORT).show());
             }
 
             @Override
             public void onResponse(Call call, Response response) {
                 try (response) {
                     if (!response.isSuccessful()) {
-                        runOnUiThread(() -> {
-                            blockScanner();
-                            viewModel.handleNewBarcode(barcode);
-                        });
+                        runOnUiThread(() -> blockScanner());
+                        viewModel.handleNewBarcode(barcode);
                     }
                     else{
                         assert response.body() != null;
@@ -128,16 +126,14 @@ public class ScannerActivity extends AppCompatActivity {
                         boolean alreadyScanned = json.optBoolean("already_scanned", false);
 
                         if (!alreadyScanned) {
-                            runOnUiThread(() -> {
-                                viewModel.updateCnt();
-                                viewModel.handleNewBarcode(barcode);
-                            });
+                            viewModel.updateCnt();
+                            viewModel.handleNewBarcode(barcode);
                         }else{
                             runOnUiThread(()-> Toast.makeText(ScannerActivity.this, R.string.already_scanned_text, Toast.LENGTH_SHORT).show());
                         }
                     }
                 } catch (JSONException | IOException e) {
-                    Toast.makeText(ScannerActivity.this, R.string.internet_error, Toast.LENGTH_SHORT).show();
+                    runOnUiThread(()->Toast.makeText(ScannerActivity.this, R.string.internet_error, Toast.LENGTH_SHORT).show());
                 }
             }
         });
@@ -187,12 +183,26 @@ public class ScannerActivity extends AppCompatActivity {
                     String body = response.body().string();
                     JSONObject json = new JSONObject(body);
                     int unscannedCount = json.getInt("unscanned");
-                    viewModel.setCntUnscanned(unscannedCount);
+                    runOnUiThread(()-> viewModel.setCntUnscanned(unscannedCount));
                 } catch (Exception e) {
-                    Toast.makeText(ScannerActivity.this, R.string.internet_error, Toast.LENGTH_SHORT).show();
+                    runOnUiThread(()->Toast.makeText(ScannerActivity.this, R.string.internet_error, Toast.LENGTH_SHORT).show());
                 }
             }
 
+        });
+    }
+    private void generateReport(){
+        ApiClient.generateReport(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                runOnUiThread(() -> Toast.makeText(ScannerActivity.this, R.string.internet_error, Toast.LENGTH_SHORT).show());
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) {
+                runOnUiThread(() -> Toast.makeText(ScannerActivity.this, R.string.crp_successful, Toast.LENGTH_SHORT).show());
+                response.close();
+            }
         });
     }
     @Override

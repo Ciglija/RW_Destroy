@@ -10,7 +10,7 @@ import java.util.List;
 public class ScannerViewModel extends ViewModel {
     private final MutableLiveData<List<String>> scannedBoxesLiveData = new MutableLiveData<>(new ArrayList<>());
 
-    private final MutableLiveData<Integer> cntUnscanned = new MutableLiveData<>(0);
+    private final MutableLiveData<Integer> cntUnscanned = new MutableLiveData<>(1);
 
     public void handleNewBarcode(String barcode) {
         if (BarcodeStorage.addBarcode(barcode)) {

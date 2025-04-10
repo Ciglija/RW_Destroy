@@ -70,7 +70,7 @@ public class LoginActivity extends AppCompatActivity {
         String password = passwordEditText.getText().toString();
 
         if (username.isEmpty() || password.isEmpty()) {
-            Toast.makeText(this, R.string.enter_credentials, Toast.LENGTH_SHORT).show();
+            runOnUiThread(() -> Toast.makeText(LoginActivity.this, R.string.enter_credentials, Toast.LENGTH_LONG).show());
             return;
         }
 
