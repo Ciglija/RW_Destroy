@@ -222,7 +222,7 @@ def generate_report():
             .to_excel(REPORT_FILE_PATH, index=False)
         msg = Message('Report poslat',
                       recipients=['kasicilija12@email.com'])
-        msg.body = 'Zavrseno skeniranje, report poslat.'
+        msg.body = 'Završeno skeniranje, Izveštaj poslat.'
         mail.send(msg)
         return jsonify({
             "message": f"Report generated at {REPORT_FILE_PATH}",

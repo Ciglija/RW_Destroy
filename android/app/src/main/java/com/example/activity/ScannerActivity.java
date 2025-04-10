@@ -1,6 +1,5 @@
 package com.example.activity;
 
-import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -63,7 +62,6 @@ public class ScannerActivity extends AppCompatActivity {
 
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
     }
-    @SuppressLint("StringFormatInvalid")
     private void setupObservers() {
         viewModel.getScannedBoxesLiveData().observe(this, barcodes -> adapter.updateBarcodes(barcodes));
 
@@ -73,7 +71,6 @@ public class ScannerActivity extends AppCompatActivity {
             else{
                 textView.setText(R.string.finished_scanning);
                 SuccessDialog.showSuccessDialog(this, () -> {
-                    generateReport();
                     Intent intent = new Intent(this, MainActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                     startActivity(intent);
@@ -189,20 +186,6 @@ public class ScannerActivity extends AppCompatActivity {
                 }
             }
 
-        });
-    }
-    private void generateReport(){
-        ApiClient.generateReport(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                runOnUiThread(() -> Toast.makeText(ScannerActivity.this, R.string.internet_error, Toast.LENGTH_SHORT).show());
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) {
-                runOnUiThread(() -> Toast.makeText(ScannerActivity.this, R.string.crp_successful, Toast.LENGTH_SHORT).show());
-                response.close();
-            }
         });
     }
     @Override

@@ -104,16 +104,16 @@ public class MainActivity extends AppCompatActivity {
                     String body = response.body().string();
                     JSONObject json = new JSONObject(body);
                     int unscannedCount = json.getInt("unscanned");
-                    runOnUiThread(()->{
+
                         if (unscannedCount > 0) {
-                            BoxAlertDialog.showUnreadBoxesAlert(MainActivity.this,
+                            runOnUiThread(()-> BoxAlertDialog.showUnreadBoxesAlert(MainActivity.this,
                                     msgStr + "Imate još: " + unscannedCount + "  kutija iz prethodne baze.",
                                     false,
-                                    () -> {});
+                                    () -> {}));
                         } else {
                             onSuccess.run();
                         }
-                    });
+
                 } catch (JSONException | IOException e) {
                     runOnUiThread(() -> Toast.makeText(MainActivity.this, R.string.internet_error, Toast.LENGTH_SHORT).show());
                 }

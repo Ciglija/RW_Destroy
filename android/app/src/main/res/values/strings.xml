@@ -36,8 +36,8 @@
     <string name="Yes">Da</string>
 
     <string name="finished_scanning_text1">SKENIRANJE JE KOMPLETIRANO</string>
-    <string name="finished_scanning_text2">SVE KUTIJE IZ BAZE SU SKENIRANE.</string>
-    <string name="write_report_text">Napravi izveštaj</string>
+    <string name="finished_scanning_text2">SVE KUTIJE IZ BAZE SU SKENIRANE.\nMOŽETE KREIRATI IZVEŠTAJ.</string>
+    <string name="write_report_text">ZAVRŠI</string>
     <string name="info_logo_text">Informacije Logo</string>
 
     <string name="internet_error">Greška sa internetom!</string>
