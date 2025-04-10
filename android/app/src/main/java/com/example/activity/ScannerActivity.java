@@ -1,5 +1,6 @@
 package com.example.activity;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -58,6 +59,7 @@ public class ScannerActivity extends AppCompatActivity {
         listView.setAdapter(adapter);
     }
 
+    @SuppressLint("StringFormatInvalid")
     private void setupObservers() {
         viewModel.getScannedBoxesLiveData().observe(this, barcodes -> {
             adapter.clear();
@@ -67,16 +69,11 @@ public class ScannerActivity extends AppCompatActivity {
 
         viewModel.getCntUnscanned().observe(this, count ->{
             if(count > 0)
-                textView.setText("Broj neočitanih kutija: " + count);
+                textView.setText(getString(R.string.unscanned_count_text, count));
             else
-                textView.setText("Završeno!");
+                textView.setText(R.string.finished_scanning);
         });
 
-        viewModel.getToastMessage().observe(this, message -> {
-            if (message != null && !message.isEmpty()) {
-                Toast.makeText(ScannerActivity.this, message, Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 
     private void setupBarcodeReceiver() {
@@ -87,7 +84,6 @@ public class ScannerActivity extends AppCompatActivity {
                     String barcode = intent.getStringExtra(BARCODE_DATA);
                     if (barcode != null && !barcode.isEmpty()) {
                         sendBarcodeToServer(barcode);
-                        viewModel.handleNewBarcode(barcode);
                     }
                 }
             }
@@ -106,25 +102,36 @@ public class ScannerActivity extends AppCompatActivity {
         ApiClient.sendBarcode(token, barcode, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                viewModel.showToast("Greška sa internetom!");
+                Toast.makeText(ScannerActivity.this, R.string.internet_error, Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onResponse(Call call, Response response) {
                 try (response) {
                     if (!response.isSuccessful()) {
-                        runOnUiThread(() -> blockScanner());
+                        runOnUiThread(() -> {
+                            blockScanner();
+                            viewModel.handleNewBarcode(barcode);
+                        });
                     }
                     else{
+                        assert response.body() != null;
                         String body = response.body().string();
                         JSONObject json = new JSONObject(body);
                         boolean alreadyScanned = json.optBoolean("already_scanned", false);
+
                         if (!alreadyScanned) {
-                            viewModel.updateCnt();
+                            runOnUiThread(() -> {
+                                viewModel.updateCnt();
+                                viewModel.handleNewBarcode(barcode);
+                            });
+
+                        }else{
+                            runOnUiThread(()-> Toast.makeText(ScannerActivity.this, R.string.already_scanned_text, Toast.LENGTH_SHORT).show());
                         }
                     }
                 } catch (JSONException | IOException e) {
-                    throw new RuntimeException(e);
+                    Toast.makeText(ScannerActivity.this, R.string.internet_error, Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -134,9 +141,9 @@ public class ScannerActivity extends AppCompatActivity {
     private void blockScanner() {
         AlertDialogHelper.showAdminAuthDialog(ScannerActivity.this, (username, password) -> checkAdminCredentials(username, password, isCorrect -> {
             if (isCorrect) {
-                runOnUiThread(() ->Toast.makeText(ScannerActivity.this, "Rad nastavljen ✅", Toast.LENGTH_SHORT).show());
+                runOnUiThread(() ->Toast.makeText(ScannerActivity.this, R.string.continue_work_text, Toast.LENGTH_SHORT).show());
             } else {
-                runOnUiThread(() -> blockScanner());
+                runOnUiThread(this::blockScanner);
             }
         }));
     }
@@ -146,7 +153,7 @@ public class ScannerActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call call, IOException e) {
                 runOnUiThread(() -> {
-                    Toast.makeText(ScannerActivity.this, "Greška sa internetom!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ScannerActivity.this, R.string.internet_error, Toast.LENGTH_SHORT).show();
                     callback.onResult(false);
                 });
             }
@@ -164,20 +171,19 @@ public class ScannerActivity extends AppCompatActivity {
         ApiClient.getUnscannedCount(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                runOnUiThread(() -> Toast.makeText(ScannerActivity.this, "Greška sa internetom!", Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(ScannerActivity.this, R.string.internet_error, Toast.LENGTH_SHORT).show());
             }
 
             @Override
             public void onResponse(Call call, Response response) {
                 try {
+                    assert response.body() != null;
                     String body = response.body().string();
                     JSONObject json = new JSONObject(body);
                     int unscannedCount = json.getInt("unscanned");
-                    runOnUiThread(() -> {
-                        viewModel.setCntUnscanned(unscannedCount);
-                    });
+                    viewModel.setCntUnscanned(unscannedCount);
                 } catch (Exception e) {
-                    Toast.makeText(ScannerActivity.this, "Greška u obradi podataka!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ScannerActivity.this, R.string.internet_error, Toast.LENGTH_SHORT).show();
                 }
             }
 

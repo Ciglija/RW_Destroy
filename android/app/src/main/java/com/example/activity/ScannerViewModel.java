@@ -9,7 +9,6 @@ import java.util.List;
 
 public class ScannerViewModel extends ViewModel {
     private final MutableLiveData<List<String>> scannedBoxesLiveData = new MutableLiveData<>(new ArrayList<>());
-    private final MutableLiveData<String> toastMessage = new MutableLiveData<>();
 
     private final MutableLiveData<Integer> cntUnscanned = new MutableLiveData<>(0);
 
@@ -24,9 +23,6 @@ public class ScannerViewModel extends ViewModel {
                 newList.add(barcode);
                 scannedBoxesLiveData.postValue(newList);
             }
-            showToast("Uspešno skeniranje ✅");
-        } else {
-            showToast("Barkod vec skeniran.");
         }
     }
 
@@ -34,14 +30,8 @@ public class ScannerViewModel extends ViewModel {
         return scannedBoxesLiveData;
     }
 
-    public LiveData<String> getToastMessage() {
-        return toastMessage;
-    }
     public MutableLiveData<Integer> getCntUnscanned() { return cntUnscanned; }
 
-    public void showToast(String message) {
-        toastMessage.postValue(message);
-    }
 
     public void updateBarcodesFromStorage() {
         scannedBoxesLiveData.postValue(BarcodeStorage.getBarcodes());

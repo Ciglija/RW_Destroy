@@ -1,4 +1,5 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#003366">
@@ -17,9 +18,10 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="24dp"
             android:adjustViewBounds="true"
+            android:contentDescription="@string/rwlogo_cd_text"
             android:src="@drawable/rw_logo"
-            android:tint="#FFFFFF"
-            android:tintMode="src_in" />
+            android:tintMode="src_in"
+            app:tint="#FFFFFF" />
 
         <Space
             android:layout_width="match_parent"
@@ -30,10 +32,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
+            android:autofillHints=""
             android:background="@drawable/border_white"
-            android:drawableLeft="@drawable/baseline_man_24"
+            android:drawableStart="@drawable/baseline_man_24"
             android:drawablePadding="10dp"
-            android:hint="Username"
+            android:hint="@string/username"
             android:inputType="textEmailAddress"
             android:padding="16dp"
             android:textColorHint="#FFFFFF"
@@ -43,13 +46,14 @@
             android:id="@+id/password_edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Password"
+            android:autofillHints=""
+            android:hint="@string/password"
             android:inputType="textPassword"
             android:textColorHint="#FFFFFF"
             android:textColor="#FFFFFF"
             android:layout_marginTop="16dp"
             android:background="@drawable/border_white"
-            android:drawableLeft="@drawable/baseline_key_24"
+            android:drawableStart="@drawable/baseline_key_24"
             android:drawablePadding="10dp"
             android:padding="16dp" />
 
@@ -57,7 +61,7 @@
             android:id="@+id/btn_login"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:text="LOGIN"
+            android:text="@string/btn_login_text"
             android:textColor="#003366"
             android:backgroundTint="#FFFFFF"
             android:textStyle="bold"

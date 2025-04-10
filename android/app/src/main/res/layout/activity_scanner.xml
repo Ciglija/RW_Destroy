@@ -7,7 +7,7 @@
 
     <TextView
         android:id="@+id/scanned_barcode_text_view"
-        android:text="Očitani barkodovi:"
+        android:text="@string/scanned_barcodes"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -29,7 +29,7 @@
         android:id="@+id/unscanned_count_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Broj neočitanih kutija: "
+        android:text="@string/unscanned_count_text"
         android:textSize="16sp"
         android:textStyle="bold"
         android:gravity="center"

@@ -8,12 +8,11 @@
     android:background="@drawable/bg_dialog_rounded"
     android:gravity="center_horizontal">
 
-    <!-- Naslov -->
     <TextView
         android:id="@+id/dialogTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Aplikacija blokirana!\nOčitani barkod nije u bazi!"
+        android:text="@string/msg_blocked_app_text"
         android:textSize="18sp"
         android:textStyle="bold"
         android:textColor="#222222"
@@ -23,43 +22,30 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Unesite admin podatke za nastavak"
+        android:text="@string/msg_instruction_text"
         android:textSize="16sp"
         android:textColor="#444444"
         android:gravity="center"
         android:layout_marginBottom="24dp" />
 
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Korisničko ime"
-        android:textSize="14sp"
-        android:textColor="#333333"
-        android:layout_marginBottom="4dp" />
-
     <EditText
         android:id="@+id/etUsername"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Unesite admin ime"
+        android:autofillHints=""
+        android:hint="@string/admin_username"
         android:inputType="text"
         android:backgroundTint="#6200EE"
         android:layout_marginBottom="16dp" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Šifra:"
-        android:textSize="14sp"
-        android:textColor="#333333"
-        android:layout_marginBottom="4dp" />
 
     <EditText
         android:id="@+id/etPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Unesite admin šifru"
+        android:autofillHints=""
+        android:hint="@string/admin_password"
         android:inputType="textPassword"
         android:backgroundTint="#6200EE"
         android:layout_marginBottom="24dp" />
@@ -77,7 +63,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Potvrdi"
+            android:text="@string/btn_accept_text"
             android:backgroundTint="#6200EE"
             android:textColor="#FFFFFF" />
     </LinearLayout>

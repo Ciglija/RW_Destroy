@@ -16,13 +16,12 @@ public class BoxAlertDialog {
     public static void showUnreadBoxesAlert(Context context, String message, boolean hasNegativeButton, AlertResponseListener listener) {
         View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_custom, null);
 
-        TextView title = dialogView.findViewById(R.id.dialogTitle);
         TextView msg = dialogView.findViewById(R.id.dialogMessage);
         Button positiveBtn = dialogView.findViewById(R.id.positiveButton);
         Button negativeBtn = dialogView.findViewById(R.id.negativeButton);
 
         msg.setText(message);
-        positiveBtn.setText(hasNegativeButton ? "Da" : "Razumem");
+        positiveBtn.setText(hasNegativeButton ?context.getString(R.string.Yes) : context.getString(R.string.accept_txt));
 
         AlertDialog dialog = new AlertDialog.Builder(context)
                 .setView(dialogView)

@@ -39,7 +39,7 @@ public class AlertDialogHelper {
                 String adminPassword = etPassword.getText().toString().trim();
 
                 if (adminUsername.isEmpty() || adminPassword.isEmpty()) {
-                    Toast.makeText(context, "Unesite oba podatka!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, R.string.enter_credentials, Toast.LENGTH_SHORT).show();
                 } else {
                     dialog.dismiss();
                     callback.onCredentialsEntered(adminUsername, adminPassword);
@@ -51,7 +51,7 @@ public class AlertDialogHelper {
             dialog.show();
 
         } catch (Exception e) {
-            Toast.makeText(context, "Greška pri prikazivanju dijaloga!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, R.string.error_dialog_box_text, Toast.LENGTH_SHORT).show();
         }
     }
 }

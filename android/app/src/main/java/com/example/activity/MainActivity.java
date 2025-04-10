@@ -2,7 +2,6 @@ package com.example.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -39,13 +38,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initializeEvents() {
-        btnLoadDatabase.setOnClickListener(v -> getUnscannedCount(() -> checkClient(this::loadDatabase), "Nije moguće učitati novu bazu.\n"));
+        btnLoadDatabase.setOnClickListener(v -> getUnscannedCount(() -> checkClient(this::loadDatabase), getString(R.string.ldb_error)));
         btnScan.setOnClickListener(v -> {
             Intent intent = new Intent(this, ScannerActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(intent);
         });
-        btnSendReport.setOnClickListener(v -> getUnscannedCount(this::sendReport, "Nije moguće kreirati izveštaj.\n"));
+        btnSendReport.setOnClickListener(v -> getUnscannedCount(this::sendReport, getString(R.string.crp_error)));
     }
 
     private void loadDatabase() {
@@ -53,13 +52,13 @@ public class MainActivity extends AppCompatActivity {
         ApiClient.loadDatabase(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                runOnUiThread(() -> Toast.makeText(MainActivity.this, "Greška sa internetom!!", Toast.LENGTH_LONG).show());
+                runOnUiThread(() -> Toast.makeText(MainActivity.this, R.string.internet_error, Toast.LENGTH_LONG).show());
             }
 
             @Override
             public void onResponse(Call call, Response response) {
                 BarcodeStorage.clear();
-                runOnUiThread(() -> Toast.makeText(MainActivity.this, "Uspesno učitana baza!", Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(MainActivity.this, R.string.ldb_successful, Toast.LENGTH_SHORT).show());
                 response.close();
             }
         });
@@ -68,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
         ApiClient.getClientName(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                runOnUiThread(() -> Toast.makeText(MainActivity.this, "Greška sa internetom!", Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(MainActivity.this, R.string.internet_error, Toast.LENGTH_SHORT).show());
             }
 
             @Override
@@ -78,14 +77,12 @@ public class MainActivity extends AppCompatActivity {
                     String body = response.body().string();
                     JSONObject json = new JSONObject(body);
                     String clientName = json.getString("client_name");
-                    runOnUiThread(()->{
-                    BoxAlertDialog.showUnreadBoxesAlert(MainActivity.this,
+                    runOnUiThread(()-> BoxAlertDialog.showUnreadBoxesAlert(MainActivity.this,
                             "Da li se uništava klijent pod nazivom: " + clientName + "?",
                             true,
-                            onSuccess::run);
-                    });
+                            onSuccess::run));
                 } catch (JSONException | IOException e) {
-                    runOnUiThread(() -> Toast.makeText(MainActivity.this, "Greška u odgovoru!", Toast.LENGTH_SHORT).show());
+                    runOnUiThread(() -> Toast.makeText(MainActivity.this, R.string.internet_error, Toast.LENGTH_SHORT).show());
                 }
 
             }
@@ -96,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
         ApiClient.getUnscannedCount(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                runOnUiThread(() -> Toast.makeText(MainActivity.this, "Greška sa internetom!", Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(MainActivity.this, R.string.internet_error, Toast.LENGTH_SHORT).show());
             }
 
             @Override
@@ -118,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
                 } catch (JSONException | IOException e) {
-                    runOnUiThread(() -> Toast.makeText(MainActivity.this, "Greška u odgovoru!", Toast.LENGTH_SHORT).show());
+                    runOnUiThread(() -> Toast.makeText(MainActivity.this, R.string.internet_error, Toast.LENGTH_SHORT).show());
                 }
 
             }
@@ -129,12 +126,12 @@ public class MainActivity extends AppCompatActivity {
         ApiClient.generateReport(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                runOnUiThread(() -> Toast.makeText(MainActivity.this, "Greška sa internetom!", Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(MainActivity.this, R.string.internet_error, Toast.LENGTH_SHORT).show());
             }
 
             @Override
             public void onResponse(Call call, Response response) {
-                runOnUiThread(() -> Toast.makeText(MainActivity.this, "Report poslat!", Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(MainActivity.this, R.string.crp_successful, Toast.LENGTH_SHORT).show());
                 response.close();
             }
         });

@@ -52,13 +52,13 @@ public class LoginActivity extends AppCompatActivity {
         ApiClient.loadUsers(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Greška sa internetom!", Toast.LENGTH_LONG).show());
+                runOnUiThread(() -> Toast.makeText(LoginActivity.this, R.string.internet_error, Toast.LENGTH_LONG).show());
             }
 
             @Override
             public void onResponse(Call call, Response response) {
                 if (!response.isSuccessful()) {
-                    runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Korisnici nisu učitani molimo vas da restartujete aplikaciju.", Toast.LENGTH_LONG).show());
+                    runOnUiThread(() -> Toast.makeText(LoginActivity.this, R.string.internet_error, Toast.LENGTH_LONG).show());
                 }
                 response.close();
             }
@@ -70,14 +70,14 @@ public class LoginActivity extends AppCompatActivity {
         String password = passwordEditText.getText().toString();
 
         if (username.isEmpty() || password.isEmpty()) {
-            Toast.makeText(this, "Unesite korisničko ime i lozinku!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.enter_credentials, Toast.LENGTH_SHORT).show();
             return;
         }
 
         ApiClient.loginUser(username, password, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Greška u konekciji!", Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(LoginActivity.this, R.string.internet_error, Toast.LENGTH_SHORT).show());
             }
 
             @Override
@@ -91,12 +91,12 @@ public class LoginActivity extends AppCompatActivity {
                             finish();
                         });
                     } catch (Exception e) {
-                        runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Greška sa internetom!", Toast.LENGTH_SHORT).show());
+                        runOnUiThread(() -> Toast.makeText(LoginActivity.this, R.string.internet_error, Toast.LENGTH_SHORT).show());
 
                     }
                 } else {
                     passwordEditText.setText("");
-                    runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Pogrešni kredencijali!", Toast.LENGTH_SHORT).show());
+                    runOnUiThread(() -> Toast.makeText(LoginActivity.this, R.string.wrong_credentials, Toast.LENGTH_SHORT).show());
                     response.close();
                 }
             }
