@@ -12,6 +12,7 @@
     <ImageView
         android:layout_width="64dp"
         android:layout_height="64dp"
+        android:contentDescription="@string/info_logo_text"
         android:src="@android:drawable/ic_dialog_info"
         app:tint="#4CAF50" />
 

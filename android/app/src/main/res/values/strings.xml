@@ -35,6 +35,11 @@
     <string name="No">Ne</string>
     <string name="Yes">Da</string>
 
+    <string name="finished_scanning_text1">SKENIRANJE JE KOMPLETIRANO</string>
+    <string name="finished_scanning_text2">SVE KUTIJE IZ BAZE SU SKENIRANE.</string>
+    <string name="write_report_text">Napravi izveštaj</string>
+    <string name="info_logo_text">Informacije Logo</string>
+
     <string name="internet_error">Greška sa internetom!</string>
 
 
@@ -80,9 +85,7 @@
         libero vel nunc consequat, quis tincidunt nisl eleifend. Cras bibendum enim a justo luctus
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
-    <string name="finished_scanning_text1">SKENIRANJE JE KOMPLETIRANO</string>
-    <string name="finished_scanning_text2">SVE KUTIJE IZ BAZE SU SKENIRANE.</string>
-    <string name="write_report_text">Napravi izveštaj</string>
+
 
 
 </resources>
