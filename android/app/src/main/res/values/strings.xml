@@ -25,7 +25,7 @@
     <string name="continue_work_text">Rad nastavljen ✅</string>
 
     <string name="msg_blocked_app_text">Aplikacija blokirana!\nOčitani barkod nije u bazi!</string>
-    <string name="msg_instruction_text">Unesite admin podatke za nastavak</string>
+    <string name="msg_instruction_text">Sklonite kutiju!\nZovite admina!</string>
     <string name="btn_accept_text">Potvrdi</string>
     <string name="error_dialog_box_text">Greška pri prikazivanju dijaloga!</string>
     <string name="accept_txt">Razumem</string>

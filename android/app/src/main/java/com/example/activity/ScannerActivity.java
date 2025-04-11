@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -36,6 +37,8 @@ public class ScannerActivity extends AppCompatActivity {
     private String token;
     private BroadcastReceiver barcodeReceiver;
     private ScannerViewModel viewModel;
+    private MediaPlayer mpError;
+
 
 
     @Override
@@ -55,6 +58,7 @@ public class ScannerActivity extends AppCompatActivity {
         token = getSharedPreferences("AppPrefs", MODE_PRIVATE).getString("jwt_token", "");
         viewModel = new ViewModelProvider(this).get(ScannerViewModel.class);
         viewModel.updateBarcodesFromStorage();
+        mpError = MediaPlayer.create(this, R.raw.error);
 
         adapter = new BarcodeAdapter();
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -126,6 +130,7 @@ public class ScannerActivity extends AppCompatActivity {
                             viewModel.updateCnt();
                             viewModel.handleNewBarcode(barcode);
                         }else{
+                            mpError.start();
                             runOnUiThread(()-> Toast.makeText(ScannerActivity.this, R.string.already_scanned_text, Toast.LENGTH_SHORT).show());
                         }
                     }
@@ -138,6 +143,7 @@ public class ScannerActivity extends AppCompatActivity {
     }
 
     private void blockScanner() {
+        mpError.start();
         AlertDialogHelper.showAdminAuthDialog(ScannerActivity.this, (username, password) -> checkAdminCredentials(username, password, isCorrect -> {
             if (isCorrect) {
                 runOnUiThread(() ->Toast.makeText(ScannerActivity.this, R.string.continue_work_text, Toast.LENGTH_SHORT).show());
@@ -206,6 +212,10 @@ public class ScannerActivity extends AppCompatActivity {
             }
         } catch (IllegalArgumentException e) {
             Log.e(TAG, "Receiver not registered", e);
+        }
+        if (mpError != null) {
+            mpError.release();
+            mpError = null;
         }
     }
 

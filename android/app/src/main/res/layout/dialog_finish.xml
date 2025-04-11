@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:text="@string/finished_scanning_text1"
         android:textColor="#4CAF50"
-        android:textSize="22sp"
+        android:textSize="18sp"
         android:textStyle="bold"
         android:layout_marginTop="16dp" />
 
