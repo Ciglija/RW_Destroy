@@ -1,0 +1,8 @@
+flask==2.3.2
+flask-jwt-extended==4.6.0
+flask-mail==0.9.1
+sqlalchemy==2.0.27
+pandas==2.2.1
+werkzeug==2.3.8
+openpyxl==3.1.2
+python-dotenv==1.1.0

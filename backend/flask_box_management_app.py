@@ -9,6 +9,9 @@ from sqlalchemy import create_engine, text
 import pandas as pd
 import os
 from datetime import timedelta
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
 
@@ -238,4 +241,4 @@ def home():
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="192.168.0.30", port=5000, debug=True)
