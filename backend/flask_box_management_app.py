@@ -84,8 +84,6 @@ def import_users():
 
 @app.route('/load-database', methods=['POST'])
 def load_database():
-    print(BASE_DIR)
-    print(BOX_DB_FILE_PATH)
     try:
         df = pd.read_excel(BOX_DB_FILE_PATH)
         df.rename(columns={
@@ -220,7 +218,6 @@ def generate_report():
     try:
         boxes_query = text("SELECT * FROM boxes")
         all_boxes = pd.read_sql(boxes_query, con=engine)
-        print(all_boxes)
         all_boxes["present"] = all_boxes["present"].apply(lambda x: "True" if x  else "False")
         all_boxes = all_boxes.rename(columns={
             'client': 'Klijent',
