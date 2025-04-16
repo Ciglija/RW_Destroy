@@ -1,3 +1,5 @@
+import os
+from datetime import timedelta
 from flask import Flask, request, jsonify
 from flask_jwt_extended import (
     JWTManager, create_access_token,
@@ -7,8 +9,7 @@ from flask_mail import Mail, Message
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import create_engine, text
 import pandas as pd
-import os
-from datetime import timedelta
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -28,14 +29,20 @@ app.config['MAIL_DEFAULT_SENDER'] = ('RW_Skeniranje', os.getenv("EMAIL"))
 
 mail = Mail(app)
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-os.makedirs('backend/database', exist_ok=True)
-engine = create_engine('sqlite:///backend/database/RWdestroydb.db')
+DB_DIR = os.path.join(BASE_DIR, 'database')
+os.makedirs(DB_DIR, exist_ok=True)
+engine = create_engine(f'sqlite:///{os.path.join(DB_DIR, "RWdestroydb.db")}')
 
-USER_FILE_PATH = 'backend/excel_files/users.xlsx'
-BOX_DB_FILE_PATH = 'backend/excel_files/boxes.xlsx'
-REPORT_FILE_PATH = 'backend/reports/scanned_boxes_report.xlsx'
-os.makedirs('backend/reports', exist_ok=True)
+USER_FILE_PATH = os.path.join(BASE_DIR, 'excel_files', 'users.xlsx')
+BOX_DB_FILE_PATH = os.path.join(BASE_DIR, 'excel_files', 'boxes.xlsx')
+REPORT_DIR = os.path.join(BASE_DIR, 'reports')
+REPORT_FILE_PATH = os.path.join(REPORT_DIR, 'scanned_boxes_report.xlsx')
+os.makedirs(REPORT_DIR, exist_ok=True)
+
+EXCEL_DIR = os.path.join(BASE_DIR, 'excel_files')
+os.makedirs(EXCEL_DIR, exist_ok=True)
 
 
 @app.route('/login', methods=['POST'])
@@ -71,12 +78,14 @@ def import_users():
         df['password'] = df['password'].apply(generate_password_hash)
         df.to_sql('users', con=engine, if_exists='replace', index=False)
         return jsonify({"message": "Users imported successfully with hashed passwords"}), 200
-    except Exception as e:
+    except Exception:
         return jsonify({"error": "Internal server error"}), 500
 
 
 @app.route('/load-database', methods=['POST'])
 def load_database():
+    print(BASE_DIR)
+    print(BOX_DB_FILE_PATH)
     try:
         df = pd.read_excel(BOX_DB_FILE_PATH)
         df.rename(columns={
@@ -92,7 +101,7 @@ def load_database():
 
         df.to_sql('boxes', con=engine, if_exists='replace', index=False)
         return jsonify({"message": "Box database loaded successfully"}), 200
-    except Exception as e:
+    except Exception:
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -122,7 +131,7 @@ def scan_box():
                 "message": "Box already scanned",
                 "already_scanned": True
             }), 200
-        elif not box.empty and not box.at[0, "status"]:
+        if not box.empty and not box.at[0, "status"]:
             query = """
                 UPDATE boxes 
                 SET status = TRUE, 
@@ -149,7 +158,7 @@ def scan_box():
                 "message": "Box was not present in the database"
             }), 400
 
-    except Exception as e:
+    except Exception:
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -184,7 +193,7 @@ def admin_auth():
         else:
             return jsonify({"error": "Invalid admin password"}), 403
 
-    except Exception as e:
+    except Exception:
         return jsonify({"error": "Internal server error"}), 500
 
 @app.route('/get-missing-count', methods=['GET'])
@@ -231,7 +240,7 @@ def generate_report():
             "message": f"Report generated at {REPORT_FILE_PATH}",
             "report_path": REPORT_FILE_PATH
         }), 200
-    except Exception as e:
+    except Exception:
         return jsonify({"error": "Internal server error"}), 500
 
 
