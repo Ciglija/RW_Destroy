@@ -52,13 +52,13 @@ public class LoginActivity extends AppCompatActivity {
         ApiClient.loadUsers(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                runOnUiThread(() -> Toast.makeText(LoginActivity.this, R.string.internet_error, Toast.LENGTH_LONG).show());
+                runOnUiThread(() -> StylishToast.show(LoginActivity.this, getString(R.string.internet_error)));
             }
 
             @Override
             public void onResponse(Call call, Response response) {
                 if (!response.isSuccessful()) {
-                    runOnUiThread(() -> Toast.makeText(LoginActivity.this, R.string.internet_error, Toast.LENGTH_LONG).show());
+                    runOnUiThread(() -> StylishToast.show(LoginActivity.this, getString(R.string.internet_error)));
                 }
                 response.close();
             }
@@ -70,14 +70,14 @@ public class LoginActivity extends AppCompatActivity {
         String password = passwordEditText.getText().toString();
 
         if (username.isEmpty() || password.isEmpty()) {
-            runOnUiThread(() -> Toast.makeText(LoginActivity.this, R.string.enter_credentials, Toast.LENGTH_LONG).show());
+            runOnUiThread(() -> StylishToast.show(LoginActivity.this, getString(R.string.enter_credentials)));
             return;
         }
 
         ApiClient.loginUser(username, password, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                runOnUiThread(() -> Toast.makeText(LoginActivity.this, R.string.internet_error, Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> StylishToast.show(LoginActivity.this, getString(R.string.internet_error)));
             }
 
             @Override
@@ -91,12 +91,12 @@ public class LoginActivity extends AppCompatActivity {
                             finish();
                         });
                     } catch (Exception e) {
-                        runOnUiThread(() -> Toast.makeText(LoginActivity.this, R.string.internet_error, Toast.LENGTH_SHORT).show());
+                        runOnUiThread(() -> StylishToast.show(LoginActivity.this, getString(R.string.internet_error)));
 
                     }
                 } else {
                     passwordEditText.setText("");
-                    runOnUiThread(() -> Toast.makeText(LoginActivity.this, R.string.wrong_credentials, Toast.LENGTH_SHORT).show());
+                    runOnUiThread(() -> StylishToast.show(LoginActivity.this, getString(R.string.wrong_credentials)));
                     response.close();
                 }
             }

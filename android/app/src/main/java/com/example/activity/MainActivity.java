@@ -52,13 +52,13 @@ public class MainActivity extends AppCompatActivity {
         ApiClient.loadDatabase(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                runOnUiThread(() -> Toast.makeText(MainActivity.this, R.string.internet_error, Toast.LENGTH_LONG).show());
+                runOnUiThread(() -> StylishToast.show(MainActivity.this, getString(R.string.internet_error)));
             }
 
             @Override
             public void onResponse(Call call, Response response) {
                 BarcodeStorage.clear();
-                runOnUiThread(() -> Toast.makeText(MainActivity.this, R.string.ldb_successful, Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> StylishToast.show(MainActivity.this, getString(R.string.ldb_successful)));
                 response.close();
             }
         });
@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
         ApiClient.getClientName(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                runOnUiThread(() -> Toast.makeText(MainActivity.this, R.string.internet_error, Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> StylishToast.show(MainActivity.this, getString(R.string.internet_error)));
             }
 
             @Override
@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
                             true,
                             onSuccess::run));
                 } catch (JSONException | IOException e) {
-                    runOnUiThread(() -> Toast.makeText(MainActivity.this, R.string.internet_error, Toast.LENGTH_SHORT).show());
+                    runOnUiThread(() -> StylishToast.show(MainActivity.this, getString(R.string.internet_error)));
                 }
 
             }
@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
         ApiClient.getUnscannedCount(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                runOnUiThread(() -> Toast.makeText(MainActivity.this, R.string.internet_error, Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> StylishToast.show(MainActivity.this, getString(R.string.internet_error)));
             }
 
             @Override
@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                 } catch (JSONException | IOException e) {
-                    runOnUiThread(() -> Toast.makeText(MainActivity.this, R.string.internet_error, Toast.LENGTH_SHORT).show());
+                    runOnUiThread(() -> StylishToast.show(MainActivity.this, getString(R.string.internet_error)));
                 }
 
             }
@@ -126,12 +126,12 @@ public class MainActivity extends AppCompatActivity {
         ApiClient.generateReport(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                runOnUiThread(() -> Toast.makeText(MainActivity.this, R.string.internet_error, Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> StylishToast.show(MainActivity.this, getString(R.string.internet_error)));
             }
 
             @Override
             public void onResponse(Call call, Response response) {
-                runOnUiThread(() -> Toast.makeText(MainActivity.this, R.string.crp_successful, Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> StylishToast.show(MainActivity.this, getString(R.string.crp_successful)));
                 response.close();
             }
         });

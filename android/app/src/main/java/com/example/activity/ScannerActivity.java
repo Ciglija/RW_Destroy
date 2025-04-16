@@ -110,7 +110,7 @@ public class ScannerActivity extends AppCompatActivity {
         ApiClient.sendBarcode(token, barcode, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                runOnUiThread(()->Toast.makeText(ScannerActivity.this, R.string.internet_error, Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> StylishToast.show(ScannerActivity.this, getString(R.string.internet_error)));
             }
 
             @Override
@@ -127,15 +127,16 @@ public class ScannerActivity extends AppCompatActivity {
                         boolean alreadyScanned = json.optBoolean("already_scanned", false);
 
                         if (!alreadyScanned) {
+                            runOnUiThread(() -> StylishToast.show(ScannerActivity.this, getString(R.string.good_scan)));
                             viewModel.updateCnt();
                             viewModel.handleNewBarcode(barcode);
                         }else{
                             mpError.start();
-                            runOnUiThread(()-> Toast.makeText(ScannerActivity.this, R.string.already_scanned_text, Toast.LENGTH_SHORT).show());
+                            runOnUiThread(() -> StylishToast.show(ScannerActivity.this, getString(R.string.already_scanned_text)));
                         }
                     }
                 } catch (JSONException | IOException e) {
-                    runOnUiThread(()->Toast.makeText(ScannerActivity.this, R.string.internet_error, Toast.LENGTH_SHORT).show());
+                    runOnUiThread(() -> StylishToast.show(ScannerActivity.this, getString(R.string.internet_error)));
                 }
             }
         });
@@ -146,7 +147,7 @@ public class ScannerActivity extends AppCompatActivity {
         mpError.start();
         AlertDialogHelper.showAdminAuthDialog(ScannerActivity.this, (username, password) -> checkAdminCredentials(username, password, isCorrect -> {
             if (isCorrect) {
-                runOnUiThread(() ->Toast.makeText(ScannerActivity.this, R.string.continue_work_text, Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> StylishToast.show(ScannerActivity.this, getString(R.string.continue_work_text)));
             } else {
                 runOnUiThread(this::blockScanner);
             }
@@ -158,7 +159,7 @@ public class ScannerActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call call, IOException e) {
                 runOnUiThread(() -> {
-                    Toast.makeText(ScannerActivity.this, R.string.internet_error, Toast.LENGTH_SHORT).show();
+                    runOnUiThread(() -> StylishToast.show(ScannerActivity.this, getString(R.string.internet_error)));
                     callback.onResult(false);
                 });
             }
@@ -176,7 +177,7 @@ public class ScannerActivity extends AppCompatActivity {
         ApiClient.getUnscannedCount(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                runOnUiThread(() -> Toast.makeText(ScannerActivity.this, R.string.internet_error, Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> StylishToast.show(ScannerActivity.this, getString(R.string.internet_error)));
             }
 
             @Override
@@ -188,7 +189,7 @@ public class ScannerActivity extends AppCompatActivity {
                     int unscannedCount = json.getInt("unscanned");
                     runOnUiThread(()-> viewModel.setCntUnscanned(unscannedCount));
                 } catch (Exception e) {
-                    runOnUiThread(()->Toast.makeText(ScannerActivity.this, R.string.internet_error, Toast.LENGTH_SHORT).show());
+                    runOnUiThread(() -> StylishToast.show(ScannerActivity.this, getString(R.string.internet_error)));
                 }
             }
 
