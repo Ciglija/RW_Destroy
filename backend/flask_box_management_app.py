@@ -68,11 +68,9 @@ def import_users():
     try:
         df = pd.read_excel(USER_FILE_PATH)
         df.rename(columns={
-            'Zaposleni': 'employee',
-            'Username': 'username',
-            'Password': 'password',
-            'Status': 'status',
-            'Sifra admina za ispravku': 'admin_code_info'
+            'Login name': 'username',
+            'Lozinka': 'password',
+            'Vrsta korisnika': 'status',
         }, inplace=True)
 
         df['password'] = df['password'].apply(generate_password_hash)
@@ -177,19 +175,13 @@ def admin_auth():
         if user.empty:
             return jsonify({"error": "Admin not found"}), 404
 
-        if user.iloc[0]['status'] != 'Admin' or user.iloc[0]['admin_code_info'] == 'Nema':
+        if not check_password_hash(user.iloc[0]['password'], password):
+            return jsonify({"error": "Invalid credentials"}), 401
+
+        if user.iloc[0]['status'] != 'Admin':
             return jsonify({"error": "Admin access required"}), 403
 
-
-        admin_code_info = user.iloc[0]['admin_code_info']
-        if not admin_code_info.startswith('Ima sifra '):
-            return jsonify({"error": "Invalid admin code format"}), 400
-
-        stored_admin_code = admin_code_info.replace('Ima sifra ', '').strip()
-        if password == stored_admin_code:
-            return jsonify({"message": "Admin privileges granted"}), 200
-        else:
-            return jsonify({"error": "Invalid admin password"}), 403
+        return jsonify({"message": "Admin privileges granted"}), 200
 
     except Exception:
         return jsonify({"error": "Internal server error"}), 500
