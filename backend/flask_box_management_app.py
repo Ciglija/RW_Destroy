@@ -25,7 +25,7 @@ app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = os.getenv("EMAIL")
 app.config['MAIL_PASSWORD'] = os.getenv("PASSWORD")
-app.config['MAIL_DEFAULT_SENDER'] = ('RW_Skeniranje', os.getenv("EMAIL"))
+app.config['MAIL_DEFAULT_SENDER'] = ('RW_Uništavanje', os.getenv("EMAIL"))
 
 mail = Mail(app)
 
@@ -38,7 +38,6 @@ engine = create_engine(f'sqlite:///{os.path.join(DB_DIR, "RWdestroydb.db")}')
 USER_FILE_PATH = os.path.join(BASE_DIR, 'excel_files', 'users.xlsx')
 BOX_DB_FILE_PATH = os.path.join(BASE_DIR, 'excel_files', 'boxes.xlsx')
 REPORT_DIR = os.path.join(BASE_DIR, 'reports')
-REPORT_FILE_PATH = os.path.join(REPORT_DIR, 'scanned_boxes_report.xlsx')
 os.makedirs(REPORT_DIR, exist_ok=True)
 
 EXCEL_DIR = os.path.join(BASE_DIR, 'excel_files')
@@ -210,7 +209,7 @@ def generate_report():
     try:
         boxes_query = text("SELECT * FROM boxes")
         all_boxes = pd.read_sql(boxes_query, con=engine)
-        all_boxes["present"] = all_boxes["present"].apply(lambda x: "True" if x  else "False")
+        all_boxes["present"] = all_boxes["present"].apply(lambda x: "Da" if x  else "Ne")
         all_boxes = all_boxes.rename(columns={
             'client': 'Klijent',
             'box': 'Kutija',
@@ -219,15 +218,20 @@ def generate_report():
             'scan_time': 'Vreme skeniranja',
             'present': 'Nalazila se u bazi'
         })
+        df_client = pd.read_excel(BOX_DB_FILE_PATH, nrows=1)
+        client_name = df_client.at[0, "Klijent"].replace(" ", "_")
+        timestamp = pd.Timestamp.now().strftime("%Y-%m-%d-%H-%M-%S")
+        report_filename = f"{timestamp}_{client_name}.xlsx"
+        report_path = os.path.join(REPORT_DIR, report_filename)
         all_boxes[['Klijent', 'Kutija', 'Tura', 'Skenirao', 'Vreme skeniranja', 'Nalazila se u bazi']] \
-            .to_excel(REPORT_FILE_PATH, index=False)
-        msg = Message('Report poslat',
-                      recipients=['kasicilija12@email.com'])
-        msg.body = 'Završeno skeniranje, Izveštaj poslat.'
+            .to_excel(report_path, index=False)
+        msg = Message('Izveštaj sa uništavanja', recipients=['kasicilija12@gmail.com'])
+        msg.body = 'Završeno skeniranje, Izveštaj se nalazi u prilogu.'
+        with app.open_resource(report_path) as fp:
+            msg.attach(report_filename, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fp.read())
         mail.send(msg)
         return jsonify({
-            "message": f"Report generated at {REPORT_FILE_PATH}",
-            "report_path": REPORT_FILE_PATH
+            "message": f"Report generated at {report_path}",
         }), 200
     except Exception:
         return jsonify({"error": "Internal server error"}), 500
