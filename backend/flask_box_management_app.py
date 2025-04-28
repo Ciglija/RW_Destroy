@@ -195,6 +195,17 @@ def get_missing_count():
     except Exception as e:
         return jsonify({"error": "Internal server error"}), 500
 
+@app.route('/get-missing-boxes', methods=['GET'])
+def get_missing_boxes():
+    try:
+        with engine.connect() as connection:
+            result = connection.execute(text("SELECT * FROM boxes WHERE status = FALSE"))
+            rows = result.fetchall()
+            missing_boxes = [dict(row._mapping) for row in rows]
+            return jsonify({"missing_boxes": missing_boxes}), 200
+    except Exception as e:
+        return jsonify({"error": "Internal server error"}), 500
+
 @app.route('/get-client-name', methods=['GET'])
 def get_client_name():
     try:

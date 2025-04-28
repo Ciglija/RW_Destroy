@@ -5,7 +5,9 @@ data = {}
 
 try:
     response = requests.post(url, json=data)
-    print(f"Status Code: {response.status_code}")
-    print(f"Response: {response.text}")
+    if response.status_code == 200:
+        print("Uspešno učitane kutije.")
+    else:
+        print("Proverite da li je server pokrenut.")
 except requests.exceptions.RequestException as e:
-    print(f"Error sending POST request: {e}")
+    print("Proverite da li je server pokrenut.")
