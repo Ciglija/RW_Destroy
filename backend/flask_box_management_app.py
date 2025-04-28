@@ -20,7 +20,7 @@ app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
 jwt = JWTManager(app)
 
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_SERVER'] = 'smtp.gmail.com' #smtp.office365.com
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = os.getenv("EMAIL")
@@ -225,13 +225,13 @@ def generate_report():
         report_path = os.path.join(REPORT_DIR, report_filename)
         all_boxes[['Klijent', 'Kutija', 'Tura', 'Skenirao', 'Vreme skeniranja', 'Nalazila se u bazi']] \
             .to_excel(report_path, index=False)
-        msg = Message('Izveštaj sa uništavanja', recipients=['kasicilija12@gmail.com'])
+        msg = Message('Izveštaj sa uništavanja', recipients=[os.getenv("EMAIL")])
         msg.body = 'Završeno skeniranje, Izveštaj se nalazi u prilogu.'
         with app.open_resource(report_path) as fp:
             msg.attach(report_filename, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fp.read())
         mail.send(msg)
         return jsonify({
-            "message": f"Report generated at {report_path}",
+            "message": f"Report generated",
         }), 200
     except Exception:
         return jsonify({"error": "Internal server error"}), 500
@@ -243,4 +243,4 @@ def home():
 
 
 if __name__ == '__main__':
-    app.run(host="192.168.0.30", port=5000, debug=True)
+    app.run()

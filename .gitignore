@@ -15,3 +15,13 @@
 local.properties
 /backend/.env
 venv
+.idea
+./backend/database
+./backend/excel_files
+./backend/reports
+./android/build
+local
+./backend/.pytest_cache
+./backend/__pycache__
+./android/gradlew*
+./android/app/build

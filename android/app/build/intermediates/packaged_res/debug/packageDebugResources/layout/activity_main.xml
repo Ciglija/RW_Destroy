@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:gravity="center_horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#004494">
+
+
+    <ImageView
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:contentDescription="@string/rwlogo_cd_text"
+        android:src="@drawable/rw_logo"
+        android:layout_marginTop="32dp"
+        android:layout_gravity="center_horizontal"
+        android:adjustViewBounds="true" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="60dp" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_load_database"
+        android:text="@string/btn_ldb_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_background"
+        android:textColor="#FFFFFF"
+        android:padding="12dp"
+        android:layout_marginBottom="12dp" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_scan"
+        android:text="@string/btn_start_scan_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_background"
+        android:textColor="#FFFFFF"
+        android:padding="12dp"
+        android:layout_marginBottom="12dp" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_create_report"
+        android:text="@string/btn_create_report_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_background"
+        android:textColor="#FFFFFF"
+        android:padding="12dp"
+        android:layout_marginBottom="16dp" />
+
+</LinearLayout>

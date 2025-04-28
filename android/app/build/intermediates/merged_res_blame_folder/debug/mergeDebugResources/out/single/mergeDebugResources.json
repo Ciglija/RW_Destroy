@@ -1,0 +1,158 @@
+[
+    {
+        "merged": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-debug-44:\\drawable_rw_logo.png.flat",
+        "source": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-main-46:\\drawable\\rw_logo.png"
+    },
+    {
+        "merged": "com.example.activity.app-debug-44:/xml_network_security_config.xml.flat",
+        "source": "com.example.activity.app-main-46:/xml/network_security_config.xml"
+    },
+    {
+        "merged": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-debug-44:\\mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-main-46:\\mipmap-anydpi-v26\\ic_launcher.xml"
+    },
+    {
+        "merged": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-debug-44:\\layout_dialog_finish.xml.flat",
+        "source": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-main-46:\\layout\\dialog_finish.xml"
+    },
+    {
+        "merged": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-debug-44:\\drawable_ic_launcher_background.xml.flat",
+        "source": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-main-46:\\drawable\\ic_launcher_background.xml"
+    },
+    {
+        "merged": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-debug-44:\\drawable_baseline_key_24.xml.flat",
+        "source": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-main-46:\\drawable\\baseline_key_24.xml"
+    },
+    {
+        "merged": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-debug-44:\\mipmap-mdpi_ic_launcher_round.webp.flat",
+        "source": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-main-46:\\mipmap-mdpi\\ic_launcher_round.webp"
+    },
+    {
+        "merged": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-debug-44:\\drawable_reisswolflogo.png.flat",
+        "source": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-main-46:\\drawable\\reisswolflogo.png"
+    },
+    {
+        "merged": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-debug-44:\\mipmap-xxxhdpi_ic_launcher_round.webp.flat",
+        "source": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-main-46:\\mipmap-xxxhdpi\\ic_launcher_round.webp"
+    },
+    {
+        "merged": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-debug-44:\\mipmap-hdpi_ic_launcher_round.webp.flat",
+        "source": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-main-46:\\mipmap-hdpi\\ic_launcher_round.webp"
+    },
+    {
+        "merged": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-debug-44:\\mipmap-xxhdpi_ic_launcher_round.webp.flat",
+        "source": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-main-46:\\mipmap-xxhdpi\\ic_launcher_round.webp"
+    },
+    {
+        "merged": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-debug-44:\\mipmap-mdpi_ic_launcher.webp.flat",
+        "source": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-main-46:\\mipmap-mdpi\\ic_launcher.webp"
+    },
+    {
+        "merged": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-debug-44:\\layout_activity_login.xml.flat",
+        "source": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-main-46:\\layout\\activity_login.xml"
+    },
+    {
+        "merged": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-debug-44:\\layout_item_barcode.xml.flat",
+        "source": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-main-46:\\layout\\item_barcode.xml"
+    },
+    {
+        "merged": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-debug-44:\\drawable_baseline_man_24.xml.flat",
+        "source": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-main-46:\\drawable\\baseline_man_24.xml"
+    },
+    {
+        "merged": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-debug-44:\\layout_custom_toast.xml.flat",
+        "source": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-main-46:\\layout\\custom_toast.xml"
+    },
+    {
+        "merged": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-debug-44:\\xml_data_extraction_rules.xml.flat",
+        "source": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-main-46:\\xml\\data_extraction_rules.xml"
+    },
+    {
+        "merged": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-debug-44:\\drawable_button_background.xml.flat",
+        "source": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-main-46:\\drawable\\button_background.xml"
+    },
+    {
+        "merged": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-debug-44:\\drawable_bg_dialog_success.xml.flat",
+        "source": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-main-46:\\drawable\\bg_dialog_success.xml"
+    },
+    {
+        "merged": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-debug-44:\\mipmap-xxhdpi_ic_launcher.webp.flat",
+        "source": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-main-46:\\mipmap-xxhdpi\\ic_launcher.webp"
+    },
+    {
+        "merged": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-debug-44:\\layout_dialog_admin_auth.xml.flat",
+        "source": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-main-46:\\layout\\dialog_admin_auth.xml"
+    },
+    {
+        "merged": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-debug-44:\\mipmap-hdpi_ic_launcher.webp.flat",
+        "source": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-main-46:\\mipmap-hdpi\\ic_launcher.webp"
+    },
+    {
+        "merged": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-debug-44:\\layout_dialog_custom.xml.flat",
+        "source": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-main-46:\\layout\\dialog_custom.xml"
+    },
+    {
+        "merged": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-debug-44:\\drawable_border.xml.flat",
+        "source": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-main-46:\\drawable\\border.xml"
+    },
+    {
+        "merged": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-debug-44:\\xml_backup_rules.xml.flat",
+        "source": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-main-46:\\xml\\backup_rules.xml"
+    },
+    {
+        "merged": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-debug-44:\\drawable_border_white.xml.flat",
+        "source": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-main-46:\\drawable\\border_white.xml"
+    },
+    {
+        "merged": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-debug-44:\\xml_network_security_config.xml.flat",
+        "source": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-main-46:\\xml\\network_security_config.xml"
+    },
+    {
+        "merged": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-debug-44:\\layout_activity_scanner.xml.flat",
+        "source": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-main-46:\\layout\\activity_scanner.xml"
+    },
+    {
+        "merged": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-debug-44:\\navigation_nav_graph.xml.flat",
+        "source": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-main-46:\\navigation\\nav_graph.xml"
+    },
+    {
+        "merged": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-debug-44:\\mipmap-xxxhdpi_ic_launcher.webp.flat",
+        "source": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-main-46:\\mipmap-xxxhdpi\\ic_launcher.webp"
+    },
+    {
+        "merged": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-debug-44:\\mipmap-xhdpi_ic_launcher_round.webp.flat",
+        "source": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-main-46:\\mipmap-xhdpi\\ic_launcher_round.webp"
+    },
+    {
+        "merged": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-debug-44:\\drawable_toast_background.xml.flat",
+        "source": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-main-46:\\drawable\\toast_background.xml"
+    },
+    {
+        "merged": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-debug-44:\\layout_activity_main.xml.flat",
+        "source": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-main-46:\\layout\\activity_main.xml"
+    },
+    {
+        "merged": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-debug-44:\\menu_menu_main.xml.flat",
+        "source": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-main-46:\\menu\\menu_main.xml"
+    },
+    {
+        "merged": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-debug-44:\\mipmap-xhdpi_ic_launcher.webp.flat",
+        "source": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-main-46:\\mipmap-xhdpi\\ic_launcher.webp"
+    },
+    {
+        "merged": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-debug-44:\\drawable_ic_launcher_foreground.xml.flat",
+        "source": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-main-46:\\drawable\\ic_launcher_foreground.xml"
+    },
+    {
+        "merged": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-debug-44:\\mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-main-46:\\mipmap-anydpi-v26\\ic_launcher_round.xml"
+    },
+    {
+        "merged": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-debug-44:\\raw_error.mp3.flat",
+        "source": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-main-46:\\raw\\error.mp3"
+    },
+    {
+        "merged": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-debug-44:\\drawable_bg_dialog_rounded.xml.flat",
+        "source": "C:\\Users\\Ilija\\.gradle\\daemon\\8.11.1\\com.example.activity.app-main-46:\\drawable\\bg_dialog_rounded.xml"
+    }
+]

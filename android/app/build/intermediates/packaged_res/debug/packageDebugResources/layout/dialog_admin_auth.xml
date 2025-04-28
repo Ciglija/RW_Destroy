@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/dialogLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@drawable/bg_dialog_rounded"
+    android:gravity="center_horizontal">
+
+    <TextView
+        android:id="@+id/dialogTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/msg_blocked_app_text"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="#222222"
+        android:gravity="center"
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/msg_instruction_text"
+        android:textSize="16sp"
+        android:textColor="#444444"
+        android:gravity="center"
+        android:layout_marginBottom="24dp" />
+
+
+    <EditText
+        android:id="@+id/etUsername"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:autofillHints=""
+        android:hint="@string/admin_username"
+        android:inputType="text"
+        android:backgroundTint="#6200EE"
+        android:layout_marginBottom="16dp" />
+
+
+    <EditText
+        android:id="@+id/etPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:autofillHints=""
+        android:hint="@string/admin_password"
+        android:inputType="textPassword"
+        android:backgroundTint="#6200EE"
+        android:layout_marginBottom="24dp" />
+
+    <LinearLayout
+        android:id="@+id/dialogButtons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:weightSum="2">
+
+        <Button
+            android:id="@+id/btnConfirm"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/btn_accept_text"
+            android:backgroundTint="#6200EE"
+            android:textColor="#FFFFFF" />
+    </LinearLayout>
+
+</LinearLayout>
