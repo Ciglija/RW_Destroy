@@ -82,7 +82,7 @@ def import_users():
 @app.route('/load-database', methods=['POST'])
 def load_database():
     try:
-        df = pd.read_excel(BOX_DB_FILE_PATH)
+        df = pd.read_excel(BOX_DB_FILE_PATH, dtype={"Kutija": str})
         df.rename(columns={
             'Klijent': 'client',
             'Kutija': 'box',
@@ -221,6 +221,7 @@ def generate_report():
         boxes_query = text("SELECT * FROM boxes")
         all_boxes = pd.read_sql(boxes_query, con=engine)
         all_boxes["present"] = all_boxes["present"].apply(lambda x: "Da" if x  else "Ne")
+        all_boxes['box'] = all_boxes['box'].astype(str)
         all_boxes = all_boxes.rename(columns={
             'client': 'Klijent',
             'box': 'Kutija',
@@ -234,8 +235,13 @@ def generate_report():
         timestamp = pd.Timestamp.now().strftime("%Y-%m-%d-%H-%M-%S")
         report_filename = f"{timestamp}_{client_name}.xlsx"
         report_path = os.path.join(REPORT_DIR, report_filename)
-        all_boxes[['Klijent', 'Kutija', 'Tura', 'Skenirao', 'Vreme skeniranja', 'Nalazila se u bazi']] \
-            .to_excel(report_path, index=False)
+        with pd.ExcelWriter(report_path, engine='xlsxwriter') as writer:
+            selected_columns = ['Klijent', 'Kutija', 'Tura', 'Skenirao', 'Vreme skeniranja', 'Nalazila se u bazi']
+            all_boxes[selected_columns].to_excel(writer, index=False, sheet_name='Izvestaj')
+            workbook = writer.book
+            worksheet = writer.sheets['Izvestaj']
+            text_format = workbook.add_format({'num_format': '@'})  # format kao tekst
+            worksheet.set_column('B:B', 20, text_format)  # kolona B = 'Kutija'
         msg = Message('Izveštaj sa uništavanja', recipients=[os.getenv("EMAIL")])
         msg.body = 'Završeno skeniranje, Izveštaj se nalazi u prilogu.'
         with app.open_resource(report_path) as fp:
