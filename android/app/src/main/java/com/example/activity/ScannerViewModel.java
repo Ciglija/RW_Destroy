@@ -40,8 +40,5 @@ public class ScannerViewModel extends ViewModel {
     public void setCntUnscanned(int val) {
         cntUnscanned.postValue(val);
     }
-    public void updateCnt(){
-        cntUnscanned.postValue(cntUnscanned.getValue()-1);
-    }
 
 }

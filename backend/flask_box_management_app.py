@@ -9,8 +9,11 @@ from flask_mail import Mail, Message
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import create_engine, text
 import pandas as pd
-
 from dotenv import load_dotenv
+from utils import (
+    setup_box_stats_and_triggers,
+)
+
 
 load_dotenv()
 
@@ -42,7 +45,6 @@ os.makedirs(REPORT_DIR, exist_ok=True)
 
 EXCEL_DIR = os.path.join(BASE_DIR, 'excel_files')
 os.makedirs(EXCEL_DIR, exist_ok=True)
-
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -81,6 +83,7 @@ def import_users():
 
 @app.route('/load-database', methods=['POST'])
 def load_database():
+    global counter
     try:
         df = pd.read_excel(BOX_DB_FILE_PATH, dtype={"Kutija": str})
         df.rename(columns={
@@ -95,6 +98,7 @@ def load_database():
         df['scan_time'] = None
 
         df.to_sql('boxes', con=engine, if_exists='replace', index=False)
+        setup_box_stats_and_triggers()
         return jsonify({"message": "Box database loaded successfully"}), 200
     except Exception:
         return jsonify({"error": "Internal server error"}), 500
@@ -143,10 +147,16 @@ def scan_box():
         with engine.begin() as connection:
             connection.execute(text(query), params)
 
+        with engine.begin() as connection:
+            connection.execute(text(query), params)
+
+            result = connection.execute(text("SELECT unscanned_count FROM box_stats WHERE id = 1"))
+            unscanned = result.scalar()
         if not box.empty:
             return jsonify({
                 "message": "Box scanned successfully",
-                "already_scanned": False
+                "already_scanned": False,
+                "unscanned": unscanned,
             }), 200
         else:
             return jsonify({
@@ -189,10 +199,9 @@ def admin_auth():
 def get_missing_count():
     try:
         with engine.connect() as connection:
-            result = connection.execute(text("SELECT COUNT(*) FROM boxes WHERE status = FALSE"))
-            count = result.scalar()
-            return jsonify({"unscanned": count}), 200
-    except Exception as e:
+            result = connection.execute(text("SELECT unscanned_count FROM box_stats WHERE id = 1"))
+            return jsonify({"unscanned": result.scalar()}), 200
+    except Exception:
         return jsonify({"error": "Internal server error"}), 500
 
 @app.route('/get-missing-boxes', methods=['GET'])
@@ -240,8 +249,8 @@ def generate_report():
             all_boxes[selected_columns].to_excel(writer, index=False, sheet_name='Izvestaj')
             workbook = writer.book
             worksheet = writer.sheets['Izvestaj']
-            text_format = workbook.add_format({'num_format': '@'})  # format kao tekst
-            worksheet.set_column('B:B', 20, text_format)  # kolona B = 'Kutija'
+            text_format = workbook.add_format({'num_format': '@'})
+            worksheet.set_column('B:B', 20, text_format)
         msg = Message('Izveštaj sa uništavanja', recipients=[os.getenv("EMAIL")])
         msg.body = 'Završeno skeniranje, Izveštaj se nalazi u prilogu.'
         with app.open_resource(report_path) as fp:
