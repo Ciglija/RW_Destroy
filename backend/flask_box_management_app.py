@@ -10,9 +10,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import create_engine, text
 import pandas as pd
 from dotenv import load_dotenv
-from utils import (
-    setup_box_stats_and_triggers,
-)
 
 
 load_dotenv()
