@@ -25,3 +25,10 @@ local
 ./backend/__pycache__
 ./android/gradlew*
 ./android/app/build
+backend/__pycache__/
+backend/*.pyc
+backend/app/build/
+backend/database
+backend/excel_files
+backend/reports
+android/build/reports/problems

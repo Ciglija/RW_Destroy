@@ -10,3 +10,4 @@ requests
 gunicorn
 waitress
 tabulate
+XlsxWriter

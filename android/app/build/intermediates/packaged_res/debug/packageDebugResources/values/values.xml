@@ -18,6 +18,7 @@
     <string name="btn_login_text">LOGIN</string>
     <string name="btn_start_scan_text">Uništavanje</string>
     <string name="continue_work_text">Rad nastavljen ✅</string>
+    <string name="crating_report_btn_txt">Izveštaj se kreira</string>
     <string name="crp_error">Nije moguće kreirati izveštaj.\n</string>
     <string name="crp_successful">Uspešno kreiran novi izveštaj</string>
     <string name="enter_credentials">Unesite username i password ❌</string>

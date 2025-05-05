@@ -73,6 +73,7 @@ string btn_ldb_text
 string btn_login_text
 string btn_start_scan_text
 string continue_work_text
+string crating_report_btn_txt
 string crp_error
 string crp_successful
 string enter_credentials

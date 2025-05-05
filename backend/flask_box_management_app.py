@@ -83,7 +83,6 @@ def import_users():
 
 @app.route('/load-database', methods=['POST'])
 def load_database():
-    global counter
     try:
         df = pd.read_excel(BOX_DB_FILE_PATH, dtype={"Kutija": str})
         df.rename(columns={
@@ -98,7 +97,22 @@ def load_database():
         df['scan_time'] = None
 
         df.to_sql('boxes', con=engine, if_exists='replace', index=False)
-        setup_box_stats_and_triggers()
+
+        with engine.begin() as connection:
+            connection.execute(text("DROP TRIGGER IF EXISTS update_unscanned_decrement;"))
+            connection.execute(text("DELETE FROM box_stats WHERE id = 1;"))
+            connection.execute(text("""
+                INSERT INTO box_stats (id, unscanned_count)
+                SELECT 1, COUNT(*) FROM boxes WHERE status = FALSE;
+            """))
+            connection.execute(text("""
+                CREATE TRIGGER update_unscanned_decrement
+                AFTER UPDATE ON boxes
+                WHEN OLD.status = FALSE AND NEW.status = TRUE
+                BEGIN
+                    UPDATE box_stats SET unscanned_count = unscanned_count - 1 WHERE id = 1;
+                END;
+            """))
         return jsonify({"message": "Box database loaded successfully"}), 200
     except Exception:
         return jsonify({"error": "Internal server error"}), 500
@@ -143,13 +157,8 @@ def scan_box():
                 INSERT INTO boxes (box, status, scanned_by, scan_time, present)
                 VALUES (:box_code, TRUE, :scanned_by, :scan_time, FALSE)
             """
-
         with engine.begin() as connection:
             connection.execute(text(query), params)
-
-        with engine.begin() as connection:
-            connection.execute(text(query), params)
-
             result = connection.execute(text("SELECT unscanned_count FROM box_stats WHERE id = 1"))
             unscanned = result.scalar()
         if not box.empty:
@@ -251,7 +260,7 @@ def generate_report():
             worksheet = writer.sheets['Izvestaj']
             text_format = workbook.add_format({'num_format': '@'})
             worksheet.set_column('B:B', 20, text_format)
-        msg = Message('Izveštaj sa uništavanja', recipients=[os.getenv("EMAIL")])
+        msg = Message('Izveštaj sa uništavanja', recipients=[os.getenv("RECIPIENT_EMAIL")])
         msg.body = 'Završeno skeniranje, Izveštaj se nalazi u prilogu.'
         with app.open_resource(report_path) as fp:
             msg.attach(report_filename, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fp.read())

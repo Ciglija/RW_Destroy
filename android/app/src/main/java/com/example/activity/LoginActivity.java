@@ -66,18 +66,25 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void loginUserFun() {
+        runOnUiThread(()-> loginButton.setEnabled(false));
         String username = usernameEditText.getText().toString();
         String password = passwordEditText.getText().toString();
 
         if (username.isEmpty() || password.isEmpty()) {
-            runOnUiThread(() -> StylishToast.show(LoginActivity.this, getString(R.string.enter_credentials)));
+            runOnUiThread(() -> {
+                StylishToast.show(LoginActivity.this, getString(R.string.enter_credentials));
+                loginButton.setEnabled(true);
+            });
             return;
         }
 
         ApiClient.loginUser(username, password, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                runOnUiThread(() -> StylishToast.show(LoginActivity.this, getString(R.string.internet_error)));
+                runOnUiThread(() -> {
+                    StylishToast.show(LoginActivity.this, getString(R.string.internet_error));
+                    loginButton.setEnabled(true);
+                });
             }
 
             @Override
@@ -91,12 +98,17 @@ public class LoginActivity extends AppCompatActivity {
                             finish();
                         });
                     } catch (Exception e) {
-                        runOnUiThread(() -> StylishToast.show(LoginActivity.this, getString(R.string.internet_error)));
-
+                        runOnUiThread(() -> {
+                            StylishToast.show(LoginActivity.this, getString(R.string.internet_error));
+                            loginButton.setEnabled(true);
+                        });
                     }
                 } else {
                     passwordEditText.setText("");
-                    runOnUiThread(() -> StylishToast.show(LoginActivity.this, getString(R.string.wrong_credentials)));
+                    runOnUiThread(() -> {
+                        StylishToast.show(LoginActivity.this, getString(R.string.wrong_credentials));
+                        loginButton.setEnabled(true);
+                    });
                     response.close();
                 }
             }

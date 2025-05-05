@@ -30,6 +30,3 @@ def setup_box_stats_and_triggers():
                 UPDATE box_stats SET unscanned_count = unscanned_count - 1 WHERE id = 1;
             END;
         """))
-
-
-    print("Box stats i trigersi su uspešno postavljeni.")

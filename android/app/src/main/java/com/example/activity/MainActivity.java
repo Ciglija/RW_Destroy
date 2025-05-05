@@ -3,7 +3,6 @@ package com.example.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -123,17 +122,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void sendReport() {
+        runOnUiThread(() -> {
+            btnSendReport.setEnabled(false);
+            btnSendReport.setText(R.string.crating_report_btn_txt);
+        });
         ApiClient.generateReport(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                runOnUiThread(() -> StylishToast.show(MainActivity.this, getString(R.string.internet_error)));
+                runOnUiThread(() -> {
+                    StylishToast.show(MainActivity.this, getString(R.string.internet_error));
+                    btnSendReport.setText(R.string.btn_create_report_text);
+                    btnSendReport.setEnabled(true);
+                });
             }
 
             @Override
             public void onResponse(Call call, Response response) {
-                runOnUiThread(() -> StylishToast.show(MainActivity.this, getString(R.string.crp_successful)));
+                runOnUiThread(() -> {
+                    StylishToast.show(MainActivity.this, getString(R.string.crp_successful));
+                    btnSendReport.setText(R.string.btn_create_report_text);
+                    btnSendReport.setEnabled(true);
+                });
                 response.close();
             }
         });
+
     }
 }
