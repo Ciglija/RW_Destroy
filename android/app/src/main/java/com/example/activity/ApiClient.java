@@ -13,7 +13,7 @@ import okhttp3.RequestBody;
 
 public class ApiClient {
 
-    private static final String BASE_URL = "http://192.168.0.30:5000/";
+    private static final String BASE_URL = "http://192.168.90.44:5000/";
     private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
     private static final OkHttpClient client = new OkHttpClient.Builder()
             .connectTimeout(15, TimeUnit.SECONDS)
