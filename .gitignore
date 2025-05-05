@@ -32,3 +32,5 @@ backend/database
 backend/excel_files
 backend/reports
 android/build/reports/problems
+android/gradle
+android/app/build
