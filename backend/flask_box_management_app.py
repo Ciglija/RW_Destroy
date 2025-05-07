@@ -96,11 +96,17 @@ def load_database():
         df.to_sql('boxes', con=engine, if_exists='replace', index=False)
 
         with engine.begin() as connection:
+            connection.execute(text("""
+                CREATE TABLE IF NOT EXISTS box_stats(
+                    id INTEGER PRIMARY KEY,
+                    unscanned_count INTEGER
+                );
+            """))
             connection.execute(text("DROP TRIGGER IF EXISTS update_unscanned_decrement;"))
             connection.execute(text("DELETE FROM box_stats WHERE id = 1;"))
             connection.execute(text("""
-                INSERT INTO box_stats (id, unscanned_count)
-                SELECT 1, COUNT(*) FROM boxes WHERE status = FALSE;
+                INSERT INTO box_stats(id, unscanned_count)
+                SELECT 1, COUNT(*) FROM boxes WHERE status = 0;
             """))
             connection.execute(text("""
                 CREATE TRIGGER update_unscanned_decrement
